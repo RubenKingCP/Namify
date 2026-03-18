@@ -26,6 +26,8 @@ public class LibraryView {
                 assetView = new LibraryAlbumAssetView(asset);
             } else if (asset instanceof org.example.model.Artist) {
                 assetView = new LibraryArtistAssetView(asset);
+            } else if (asset instanceof org.example.model.Playlist){
+                assetView = new LibraryPlaylistAssetView(asset);
             } else {
                 continue; // Skip unknown asset types
             }

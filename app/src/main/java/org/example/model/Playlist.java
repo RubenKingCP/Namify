@@ -29,4 +29,8 @@ public class Playlist extends Asset {
     public void play() {
         // Play the playlist
     }
+
+    public void playSong() {
+        // Play a specific song from the playlist
+    }
 }

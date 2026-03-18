@@ -1,10 +1,6 @@
 package org.example.model;
 
-public class UserAccount {
-    String userId;
-    String userName;
-    String email;
-    String password;
+public class UserAccount extends Account {
     Library library;
 
     Playlist createPlaylist(String playlistName) {
@@ -23,5 +19,17 @@ public class UserAccount {
     }
 
     void register() {
+    }
+
+    void viewProfile() {
+        // View user profile
+    }
+
+    void downloadSong(String songId) {
+        // Download a song
+    }
+    
+    void followArtist(String artistId) {
+        // Follow an artist
     }
 }

@@ -10,6 +10,10 @@ public class GenreController {
         this.genreView.setController(this);
     }
 
+    public void loadGenreData() {
+        // Load data for the genre view
+    }
+    
     public void onAssetSelected() {
         // Handle asset selection in genre view
     }

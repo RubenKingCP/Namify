@@ -18,7 +18,4 @@ public class PlaylistView {
         // Logic to display playlist view
     }
 
-    void onSongSelected() {
-        // Logic to handle song selection in playlist view
-    }
 }
