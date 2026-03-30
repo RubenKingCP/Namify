@@ -90,7 +90,7 @@ rectangle "Notifications Loop" {
   (Basic_User) --> (General_User)
   (Premium_User) --> (General_User)
   
-  (Recieve Monetization) <.. (Purchase Premium) : <<include>>
+  (Receive Monetisation) <.. (Purchase Premium) : <<include>>
   (Manage Premium Subscription) ..> (Try Premium) : <<extend>>
   (Try Premium) <.. (Purchase Premium) : <<extend>>
   (Auto-Renew Premium) ..> (Purchase Premium) : <<include>>
