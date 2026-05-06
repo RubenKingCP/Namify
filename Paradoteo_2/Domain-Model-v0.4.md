@@ -64,7 +64,7 @@ package "Model (Entities)" {
 ' =====================
 
 package "Controllers (UI)" {
-
+    interface Controller
     class MainController
     class MusicPlayerController
     class HomeController
@@ -75,6 +75,7 @@ package "Controllers (UI)" {
 }
 
 package "Views" {
+    interface View
     class MusicPlayerView
     class HomeView
     class LibraryView
@@ -84,6 +85,21 @@ package "Views" {
 }
 
 ' UI links
+MainController ..|> Controller
+MusicPlayerController ..|> Controller
+HomeController ..|> Controller
+LibraryController ..|> Controller
+TopBarController ..|> Controller
+PlaylistController ..|> Controller
+ProfileController ..|> Controller
+
+View <|.. MusicPlayerView
+View <|.. HomeView
+View <|.. LibraryView
+View <|.. TopBarView
+View <|.. PlaylistView
+View <|.. ProfileView
+
 MusicPlayerController -- MusicPlayer
 MusicPlayerView -- MusicPlayerController
 MainController -- MusicPlayerController
@@ -110,6 +126,7 @@ MainController -- Account
 package "Spring Backend" {
 
     ' Controllers (REST)
+    interface API
     class AccountControllerAPI
     class UserControllerAPI
     class ArtistControllerAPI
@@ -123,6 +140,7 @@ package "Spring Backend" {
     class ArtistRequestControllerAPI
 
     ' Services
+    interface Service
     class AccountService
     class UserService
     class ArtistService
@@ -136,6 +154,7 @@ package "Spring Backend" {
     class ArtistRequestService
 
     ' Repositories (JPA)
+    interface JpaRepository
     class AccountRepository
     class UserRepository
     class ArtistRepository
@@ -148,6 +167,44 @@ package "Spring Backend" {
     class ListeningHistoryRepository
     class ArtistRequestRepository
 }
+
+' Implementations
+
+API <|.. AccountControllerAPI
+API <|.. UserControllerAPI
+API <|.. ArtistControllerAPI
+API <|.. AdminControllerAPI
+API <|.. SongControllerAPI
+API <|.. AlbumControllerAPI
+API <|.. PlaylistControllerAPI
+API <|.. LibraryControllerAPI
+API <|.. GenreControllerAPI
+API <|.. ListeningHistoryControllerAPI
+API <|.. ArtistRequestControllerAPI
+
+Service <|.. AccountService
+Service <|.. UserService
+Service <|.. ArtistService
+Service <|.. AdminService
+Service <|.. SongService
+Service <|.. AlbumService
+Service <|.. PlaylistService
+Service <|.. LibraryService
+Service <|.. GenreService
+Service <|.. ListeningHistoryService
+Service <|.. ArtistRequestService
+
+JpaRepository <|.. AccountRepository
+JpaRepository <|.. UserRepository
+JpaRepository <|.. ArtistRepository
+JpaRepository <|.. AdminRepository
+JpaRepository <|.. SongRepository
+JpaRepository <|.. AlbumRepository
+JpaRepository <|.. PlaylistRepository
+JpaRepository <|.. LibraryRepository
+JpaRepository <|.. GenreRepository
+JpaRepository <|.. ListeningHistoryRepository
+JpaRepository <|.. ArtistRequestRepository
 
 ' Controller → Service
 AccountControllerAPI -- Account
