@@ -21,17 +21,17 @@ activate HomeController
 HomeController -> HomeView : display()
 activate HomeView
 User -> HomeView : showPlaylists()
-HomeView -> HomeController : showPlaylist()
+HomeView -> HomeController : getPlaylist()
 deactivate HomeView
 HomeController -> PlaylistController : getPlaylists()
 deactivate HomeController
 activate PlaylistController
 
-PlaylistController -> Playlist : requestPlaylists()
+PlaylistController -> Playlist : fetchPlaylistsById(userId)
 activate Playlist
-Playlist -> PlaylistControllerAPI : fetchPlaylistsById(userId)
+Playlist -> PlaylistControllerAPI : findByUserId(userId)
 activate PlaylistControllerAPI
-PlaylistControllerAPI -> PlaylistService : findByUserId(userId)
+PlaylistControllerAPI -> PlaylistService : createQuery(userId)
 activate PlaylistService
 PlaylistService -> PlaylistRepository : SELECT * FROM playlist where id=userId
 activate PlaylistRepository

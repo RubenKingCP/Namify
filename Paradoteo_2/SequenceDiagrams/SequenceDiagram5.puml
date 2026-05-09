@@ -36,7 +36,8 @@ Song -> SongControllerAPI : fetchSong(searchName)
 activate SongControllerAPI
 SongControllerAPI -> SongService : findSongByName(searchName)
 activate SongService
-SongService -> SongRepository : SELECT * FROM song where song_name = searchName
+SongService -> SongRepository : runQuery()
+'SELECT * FROM song where song_name = searchName
 activate SongRepository
 SongRepository --> SongService : row Songs
 deactivate SongRepository
@@ -52,7 +53,8 @@ Album -> AlbumControllerAPI : fetchAlbum(searchName)
 activate AlbumControllerAPI
 AlbumControllerAPI -> AlbumService : findAlbumByName(searchName)
 activate AlbumService
-AlbumService -> AlbumRepository : SELECT * FROM album WHERE album_name = searchName
+AlbumService -> AlbumRepository : runQuery()
+'SELECT * FROM album WHERE album_name = searchName
 activate AlbumRepository
 AlbumRepository --> AlbumService : row Albums
 deactivate AlbumRepository
@@ -68,7 +70,8 @@ Artist -> ArtistControllerAPI : fetchArtist(searchName)
 activate ArtistControllerAPI
 ArtistControllerAPI -> ArtistService : findArtistByName(searchName)
 activate ArtistService
-ArtistService -> ArtistRepository : SELECT * FROM artist WHERE artist_name = searchName
+ArtistService -> ArtistRepository : runQuery()
+'SELECT * FROM artist WHERE artist_name = searchName
 activate ArtistRepository
 ArtistRepository --> ArtistService : row Artists
 deactivate ArtistRepository
@@ -84,7 +87,8 @@ Playlist -> PlaylistControllerAPI : fetchPlaylist(searchName)
 activate PlaylistControllerAPI
 PlaylistControllerAPI -> PlaylistService : findPlaylistByName(searchName)
 activate PlaylistService
-PlaylistService -> PlaylistRepository : SELECT * FROM playlist where name=searchName
+PlaylistService -> PlaylistRepository : runQuery()
+'SELECT * FROM playlist where name=searchName
 activate PlaylistRepository
 PlaylistRepository --> PlaylistService : List<playlist>
 deactivate PlaylistRepository

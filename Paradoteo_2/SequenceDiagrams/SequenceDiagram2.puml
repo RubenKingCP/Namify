@@ -21,7 +21,7 @@ activate HomeView
 AppUser -> HomeView : showProfile()
 HomeView -> HomeController : showProfile()
 deactivate HomeView
-HomeController -> ProfileController : showProfile()
+HomeController -> ProfileController : getProfile()
 deactivate HomeController
 activate ProfileController
 ProfileController -> User : getUserProfile()
