@@ -1,0 +1,103 @@
+@startuml name 
+
+title Εποπτεια Περιεχομενου
+
+actor AppAdmin
+participant HomeView
+participant HomeController
+participant Artist
+participant ArtistControllerAPI
+participant ArtistService
+participant ArtistRepository
+participant Song
+participant SongControllerAPI
+participant SongService
+participant SongRepository
+
+activate HomeController
+activate HomeView
+AppAdmin -> HomeView : removeMedia()
+HomeView -> HomeView : showRemovalReasonPopup()
+AppAdmin -> HomeView : insert issues
+AppAdmin -> HomeView : continueRemoval()
+HomeView -> HomeController : checkWarnings()
+HomeController -> Artist : checkWarnings()
+activate Artist
+Artist -> ArtistControllerAPI : fetchSongWarnings()
+activate ArtistControllerAPI 
+ArtistControllerAPI -> ArtistService : findWarningBySongId()
+activate ArtistService
+ArtistService -> ArtistRepository : SELECT * FROM warning WHERE song_id = songId
+activate ArtistRepository
+ArtistRepository --> ArtistService : List <Warnings>
+deactivate ArtistRepository
+ArtistService --> ArtistControllerAPI : List <Warnings>
+deactivate ArtistService
+ArtistControllerAPI --> Artist : List <Warnings>
+deactivate ArtistControllerAPI
+Artist --> HomeController : List <Warnings>
+deactivate Artist
+HomeController -> HomeView : displayCuratorPopUp()
+alt No Further action
+    AppAdmin -> HomeView : No further actions
+    AppAdmin -> HomeView : curateContent()
+    HomeView -> HomeController : curateContent()
+    
+else Issue warning
+    AppAdmin -> HomeView : Issue Warning
+    AppAdmin -> HomeView : curateContent()
+    HomeView -> HomeController : curateContent()
+    HomeController -> Artist : issueWarning()
+    activate Artist
+    Artist -> ArtistControllerAPI : postIssueWarning()
+    activate ArtistControllerAPI 
+    ArtistControllerAPI -> ArtistService : inserWarningBySongId()
+    activate ArtistService
+    ArtistService -> ArtistRepository : INSERT INTO warning WHERE song_id = songId
+    activate ArtistRepository
+    ArtistRepository --> ArtistService : return save status
+    deactivate ArtistRepository
+    ArtistService --> ArtistControllerAPI : return save status
+    deactivate ArtistService
+    ArtistControllerAPI --> Artist : return save status
+    deactivate ArtistControllerAPI
+    Artist --> HomeController : return save status
+    deactivate Artist
+else Issue Ban
+    AppAdmin -> HomeView : Issue Ban
+    AppAdmin -> HomeView : curateContent()
+    HomeView -> HomeController : curateContent()
+    HomeController -> Artist : issueBan()
+    activate Artist
+    Artist -> ArtistControllerAPI : postBan()
+    activate ArtistControllerAPI 
+    ArtistControllerAPI -> ArtistService : postBan()
+    activate ArtistService
+    ArtistService -> ArtistRepository : INSERNT INTO ban (song_id, ban_id)
+    activate ArtistRepository
+    ArtistRepository --> ArtistService : return save status
+    deactivate ArtistRepository
+    ArtistService --> ArtistControllerAPI : return save status
+    deactivate ArtistService
+    ArtistControllerAPI --> Artist : return save status
+    deactivate ArtistControllerAPI
+    Artist --> HomeController : return save status
+    deactivate Artist
+end
+HomeController -> Song : removeSong()
+activate Song
+Song -> SongControllerAPI : postRemoveSong()
+activate SongControllerAPI
+SongControllerAPI -> SongService : removeSongById()
+activate SongService
+SongService -> SongRepository : REMOVE song from songs where song_id = songId
+activate SongRepository
+SongRepository --> SongService : return save status
+deactivate SongRepository
+SongService --> SongControllerAPI : return save status
+deactivate SongService
+SongControllerAPI --> Song : return save status
+deactivate SongControllerAPI
+Song -> HomeController : return save status
+deactivate Song
+@enduml
