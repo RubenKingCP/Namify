@@ -2,8 +2,11 @@
 
 title Ακολούθηση καλλιτέχνη
 
+'Υποθετουμε οτι εχουμε είδη βρει τον καλλιτέχνη που θέλουμε να ακολουθήσουμε
+
 actor User 
-participant "Αναζήτηση Καλλιτέχνη" as Search 
+participant TopBarView
+participant TopBarController
 participant ProfileController
 participant MainController
 participant Account
@@ -11,13 +14,9 @@ participant AccountControllerAPI
 participant AccountService
 participant AccountRepository
 
-activate Search
-Search --> User : searchResults()
-User -> Search : artist
-Search --> User : artistInfo()
-User -> Search : followArtist()
-Search -> ProfileController : artist()
-deactivate Search
+User -> TopBarView : followArtist(artistId)
+TopBarView -> TopBarController : followArtist(artistId)
+TopBarController -> ProfileController : artist(artistId)
 activate ProfileController
 ProfileController -> MainController : artist()
 deactivate ProfileController
