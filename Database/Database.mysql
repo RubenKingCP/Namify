@@ -1,0 +1,182 @@
+DROP DATABASE IF EXISTS Tunix;
+CREATE DATABASE Tunix;
+USE Tunix;
+
+-- =====================
+-- ACCOUNT
+-- =====================
+
+CREATE TABLE account (
+  account_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('USER', 'ARTIST', 'ADMIN') NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================
+-- USER & ARTIST
+-- =====================
+
+CREATE TABLE user (
+  user_id INT PRIMARY KEY,
+  display_name VARCHAR(100),
+  FOREIGN KEY (user_id) REFERENCES account(account_id) ON DELETE CASCADE
+);
+
+CREATE TABLE artist (
+  artist_id INT PRIMARY KEY,
+  name VARCHAR(100),
+  bio TEXT,
+  FOREIGN KEY (artist_id) REFERENCES account(account_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- MUSIC
+-- =====================
+
+CREATE TABLE album (
+  album_id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100),
+  artist_id INT,
+  release_date DATETIME,
+  FOREIGN KEY (artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
+);
+
+CREATE TABLE song (
+  song_id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100),
+  duration INT,
+  artist_id INT,
+  album_id INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  play_count INT DEFAULT 0,
+  FOREIGN KEY (artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE,
+  FOREIGN KEY (album_id) REFERENCES album(album_id) ON DELETE SET NULL
+);
+
+CREATE TABLE genre (
+  genre_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50)
+);
+
+-- =====================
+-- PLAYLISTS
+-- =====================
+
+CREATE TABLE playlist (
+  playlist_id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100),
+  creator_id INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  is_public BOOLEAN,
+  FOREIGN KEY (creator_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- LIBRARY
+-- =====================
+
+CREATE TABLE library (
+  library_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE libraryContent (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  library_id INT,
+  content_id INT,
+  content_type ENUM('Song', 'Album', 'Playlist'),
+  added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  UNIQUE (library_id, content_id, content_type),
+
+  FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- LIKES
+-- =====================
+
+CREATE TABLE userLike (
+  user_id INT,
+  content_id INT,
+  content_type ENUM('Song', 'Album', 'Playlist'),
+  liked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (user_id, content_id, content_type),
+
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- FOLLOWS
+-- =====================
+
+CREATE TABLE followArtist (
+  user_id INT,
+  artist_id INT,
+  followed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (user_id, artist_id),
+
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
+);
+
+CREATE TABLE followUser (
+  follower_id INT,
+  following_id INT,
+  followed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (follower_id, following_id),
+
+  FOREIGN KEY (follower_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (following_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- LISTENING HISTORY
+-- =====================
+
+CREATE TABLE listeningHistory (
+  history_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  song_id INT,
+  played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  duration_played INT,
+
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (song_id) REFERENCES song(song_id) ON DELETE CASCADE,
+
+  INDEX (user_id, played_at)
+);
+
+-- =====================
+-- RELATION TABLES
+-- =====================
+
+CREATE TABLE songGenre (
+  song_id INT,
+  genre_id INT,
+
+  PRIMARY KEY (song_id, genre_id),
+
+  FOREIGN KEY (song_id) REFERENCES song(song_id) ON DELETE CASCADE,
+  FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
+);
+
+CREATE TABLE playlistSong (
+  playlist_id INT,
+  song_id INT,
+  added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  position INT,
+
+  PRIMARY KEY (playlist_id, song_id),
+
+  FOREIGN KEY (playlist_id) REFERENCES playlist(playlist_id) ON DELETE CASCADE,
+  FOREIGN KEY (song_id) REFERENCES song(song_id) ON DELETE CASCADE
+);
