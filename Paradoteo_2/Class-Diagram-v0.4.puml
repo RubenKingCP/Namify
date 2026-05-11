@@ -65,12 +65,31 @@ package "Model (Entities)" {
 ' =====================
 
 package "Controllers (UI)" {
-    interface Controller
-    class MainController
+    interface IController{
+        public draw() : void
+    }
+    class MainController{
+        - {static} current :  IController
+        + {static} main (args : String[]) : void
+        + {static} initialize() : void
+        - {static} drawPersistenElements() : void
+        - {static} drawCenter() : void
+        + onPlaylistClicked() : void
+        + onAlbumClicked() : void
+        + onSongClicked() : void
+    }
     class MusicPlayerController
     class HomeController
-    class LibraryController
-    class TopBarController
+    class LibraryController{
+        + onPlaylistClicked() : void
+        + onAlbumClicked() : void
+        + onSongClicked() : void
+    }
+    class TopBarController{
+        + onHomeClicked() : void
+        + onSearchClicked() : void
+        + onProfileClicked() : void
+    }
     class PlaylistController
     class ProfileController
 }
