@@ -29,7 +29,27 @@ CREATE TABLE artist (
   artist_id INT PRIMARY KEY,
   name VARCHAR(100),
   bio TEXT,
+  is_banned TINYINT,
   FOREIGN KEY (artist_id) REFERENCES account(account_id) ON DELETE CASCADE
+);
+
+-- =====================
+-- ADMIN
+-- =====================
+CREATE TABLE admin (
+	admin_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    FOREIGN KEY (admin_id) REFERENCES account(account_id) ON DELETE CASCADE
+);
+
+CREATE TABLE strikes(
+	stike_id INT PRIMARY KEY AUTO_INCREMENT,
+    song_id INT,
+    admin_id INT,
+    strike_date DATETIME,
+    strike_reason VARCHAR(100),
+    FOREIGN KEY (song_id) REFERENCES song(song_id) ON DELETE CASCADE,
+    FOREIGN KEY (admin_id) REFERENCES admin(admin_id) ON DELETE CASCADE
 );
 
 -- =====================
@@ -180,3 +200,48 @@ CREATE TABLE playlistSong (
   FOREIGN KEY (playlist_id) REFERENCES playlist(playlist_id) ON DELETE CASCADE,
   FOREIGN KEY (song_id) REFERENCES song(song_id) ON DELETE CASCADE
 );
+
+-- =====================
+-- PROCEDURES
+-- =====================
+
+DELIMITER $
+
+DROP PROCEDURE IF EXISTS getUserPlaylists$
+CREATE PROCEDURE getUserPlaylists(IN userId INT)
+BEGIN
+SELECT playlist.playlist_id, playlist.title, playlist.creator_id, playlist.created_at, playlist.is_public FROM playlist
+join libraryContent on playlist.playlist_id = libraryContent.content_id
+join library on libraryContent.library_id = library.library_id
+where library.user_id = userId;
+END$
+
+DROP PROCEDURE IF EXISTS getSongByPlaylistId$
+CREATE PROCEDURE getSongByPlaylistId(IN plId INT)
+BEGIN
+SELECT * FROM song
+join playlistSong on song.song_id = playlistSong.song_id
+where playlistSong.playlist_id = plId;
+END$
+
+DROP PROCEDURE IF EXISTS findUserById$
+CREATE PROCEDURE findUserById(IN userId INT)
+BEGIN
+SELECT * FROM user where user_id = userId;
+END$
+
+DROP PROCEDURE IF EXISTS searchSongName$
+CREATE PROCEDURE searchSongName(IN songName varchar(100))
+BEGIN
+SELECT * FROM song where song.title = songName;
+END$
+
+
+
+DELIMITER ;
+
+-- SELECT library.library_id, library.user_id, library.created_at, song.song_id, album.album_id, playlist.playlist_id FROM library
+-- join libraryContent on library.library_id = libraryContent.library_id
+-- join song on libraryContent.content_id = song.song_id
+-- join album on libraryContent.content_id = album.album_id
+-- join playlist on libraryContent.content_id = playlist.playlist_id;
