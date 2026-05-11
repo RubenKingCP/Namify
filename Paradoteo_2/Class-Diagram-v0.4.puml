@@ -13,11 +13,31 @@ skinparam packageStyle rectangle
 package "Model (Entities)" {
 
     ' -------- ACCOUNT HIERARCHY --------
-    abstract class Account
-    class User
-    class Artist
-    class Admin
-    class ArtistRequest
+    abstract class Account {
+        ~ id : String
+        ~ status : Boolean
+    }
+    class User {
+        + fetchUserProfile(userId : int) : User
+        + postArtistRequest() : void
+        + getUserStatus() : Boolean
+        + followArtist(artistId : String) : void
+    }
+    class Artist {
+        + fetchArtist(searchName : String) : List<Artist>
+        + fetchSongWarnings(songId : int) : List<String>
+        + postIssueWarning() : Boolean
+        + postBan() : Boolean
+        + checkDuplicateSong() : Boolean
+    }
+    class Admin {
+        + fetchArtistApplications() : List<ArtistRequest>
+        + postRejectResponse(applicationId : int) : String
+        + postApproveResponse(applicationId : int) : String
+    }
+    class ArtistRequest{
+        - userId : String
+    }
 
     Account <|-- User
     Account <|-- Artist
@@ -29,8 +49,16 @@ package "Model (Entities)" {
     Playlist ..|> ILibraryAsset
 
     ' -------- MUSIC CORE --------
-    class Song
-    class Album
+    class Song {
+        + postRemoveSong(songId : int) : Boolean
+        + fetchSongByPlId(plId : int) : List<Song>
+        + fetchSong(searchName : String) : List<Song>
+        + fetchSong() : Boolean
+        + postSong() : Boolean
+    }
+    class Album {
+        + fetchAlbum(searchName : String) : List<Album>
+    }
     class Genre
 
     Artist "1" --> "0..*" Song : creates
@@ -41,7 +69,16 @@ package "Model (Entities)" {
     Song "0..*" -- "0..*" Genre
 
     ' -------- PLAYLIST SYSTEM --------
-    class Playlist
+    class Playlist {
+        - sendHTTPRequest() : Boolean
+        - postRemoveSongById(songId : int, playlistId : int) : void
+        - checkSongExists(songId : int) : Boolean
+        + findByUserId(userId : int) : List<Playlist>
+        + getSongsByPlaylistId(playlistId : int) : List<Song>
+        + fetchPlaylist(searchName : String) : List<Playlist>
+        + addSong(plId : int, songId : int) : Boolean
+        + addToFavorites(songId : int, userId : int) : Boolean
+    }
 
     User "1" --> "0..*" Playlist : owns
     Playlist "0..*" -- "0..*" Song
