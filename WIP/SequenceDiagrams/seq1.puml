@@ -1,0 +1,116 @@
+@startuml name
+
+title  Επιλογή Λίστας Αναπαραγωγής
+
+actor User
+participant HomeView
+participant HomeController
+participant PlaylistView
+participant PlaylistController
+participant Playlist
+participant PlaylistControllerAPI
+participant PlaylistService
+participant PlaylistRepository
+database MySQL
+
+
+' ---------- FRONTEND ----------------;
+HomeController -> HomeView : display()
+
+User -> HomeView : displayUserPlaylists()
+
+HomeView -> HomeController : displayUserPlaylists()
+
+HomeController -> PlaylistController : displayUserPlaylists()
+
+PlaylistController -> Playlist : getUserPlaylists(userId)
+activate Playlist
+
+' Playlist Model calls backend API
+
+Playlist -> PlaylistControllerAPI : fetchUserPlaylistsById(userId)
+
+' ----------------- Backend -----------'
+
+PlaylistControllerAPI -> PlaylistService : getUserPlaylistsById(userId)
+activate PlaylistService
+
+PlaylistService -> PlaylistRepository : findById(userId)
+activate PlaylistRepository
+
+PlaylistRepository -> MySQL: SELECT * FROM playlist where id=userId
+activate MySQL
+
+MySQL -> PlaylistRepository: playlist row
+deactivate MySQL
+
+PlaylistRepository --> PlaylistService : Playlist entities
+deactivate PlaylistRepository
+
+PlaylistService -> PlaylistService: map to PlaylistDTO
+
+PlaylistService --> PlaylistControllerAPI : PlaylistDTO
+deactivate PlaylistService
+
+PlaylistControllerAPI --> Playlist : JSON response(PlaylistDTO)
+
+' ----- Leave backend -> frontend -------'
+deactivate Playlist
+
+Playlist --> PlaylistController : List<Playlists>
+
+
+alt Playlists != null
+    
+    'Maybe Not Required' 
+    PlaylistController --> PlaylistView : showPlaylists()
+    
+    User -> PlaylistView : selectPlaylist()
+    
+    PlaylistView -> PlaylistController : displayPlaylistSongs()
+    
+    PlaylistController -> Playlist : getPlaylistSongs()
+    activate Playlist
+    
+    'Contact Table which stores the songs for rach playlist
+    Playlist -> PlaylistControllerAPI : fetchSongsByPlaylistId(plId)
+    
+    '----Backend----'
+    
+    PlaylistControllerAPI -> PlaylistService : getSongsWithPlaylistId(plId)
+    activate PlaylistService
+    
+    PlaylistService -> PlaylistRepository : findById(plId)
+    activate PlaylistRepository
+    
+    PlaylistRepository -> MySQL : SELECT s.* FROM song.s join pl_song ps on s.id= ps.song_id where ps.playlistId = plId
+    activate MySQL
+    
+    MySQL --> PlaylistRepository : songs row
+    deactivate MySQL
+    
+    PlaylistRepository  --> PlaylistService : Song entities
+    deactivate PlaylistRepository
+    
+    PlaylistService --> PlaylistService: map to SongDTO
+   
+    PlaylistService --> PlaylistControllerAPI: SongDTO list
+    deactivate PlaylistService
+    
+    PlaylistControllerAPI --> Playlist: JSON response
+    
+    '----------Backend to Frontend---------------'
+    Playlist --> PlaylistController: List<Songs>
+    deactivate Playlist
+    
+    alt Songs =! null
+        PlaylistController -> PlaylistView : showSelectedPlaylist()
+    else Songs == null
+        PlaylistController -> PlaylistView : showSelectedEmptyPlaylist()
+        User -> PlaylistView : addSong()
+    end
+else Playlists == null
+    PlaylistController -> PlaylistView : showPlaylistsScreen()
+    User -> PlaylistView : createPlaylist()
+end
+@enduml
