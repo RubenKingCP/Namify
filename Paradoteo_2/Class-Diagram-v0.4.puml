@@ -77,21 +77,46 @@ package "Controllers (UI)" {
         + onPlaylistClicked() : void
         + onAlbumClicked() : void
         + onSongClicked() : void
+        + onHomeClicked() : void
+        + onSearchClicked() : void
+        + onProfileClicked() : void
     }
-    class MusicPlayerController
-    class HomeController
+    class MusicPlayerController{
+        + draw() : void
+        + onPlayClicked() : void
+        + onPauseClicked() : void
+        + onNextClicked() : void
+        + onPreviousClicked() : void
+        + onVolumeChanged() : void
+        + onShuffleClicked() : void
+        + onRepeatClicked() : void
+        'Work in progress'
+        + onQueueClicked() : void
+    }
+    class HomeController{
+        +draw() : void
+    }
     class LibraryController{
+        + draw() : void
         + onPlaylistClicked() : void
         + onAlbumClicked() : void
         + onSongClicked() : void
+        + onPlaylistRightClicked() : void
+        + onAlbumRightClicked() : void
+        + onSongRightClicked() : void
     }
     class TopBarController{
         + onHomeClicked() : void
         + onSearchClicked() : void
         + onProfileClicked() : void
     }
-    class PlaylistController
-    class ProfileController
+    class PlaylistController{
+        + draw() : void
+
+    }
+    class ProfileController{
+        + draw() : void
+    }
 }
 
 package "Views" {
@@ -105,7 +130,6 @@ package "Views" {
 }
 
 ' UI links
-MainController ..|> Controller
 MusicPlayerController ..|> Controller
 HomeController ..|> Controller
 LibraryController ..|> Controller
