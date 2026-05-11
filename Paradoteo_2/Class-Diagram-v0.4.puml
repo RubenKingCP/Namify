@@ -79,7 +79,7 @@ package "Controllers (UI)" {
         + draw() : void
     }
 
-    class MainController {
+    class TunixApp {
         - {static} current : IController
 
         + {static} main(args : String[]) : void
@@ -97,6 +97,9 @@ package "Controllers (UI)" {
     }
 
     class MusicPlayerController {
+        - main : TunixApp
+        - player : MusicPlayer
+        + MusicPlayerController(main : TunixApp, player : MusicPlayer)
         + draw() : void
         + onPlayClicked() : void
         + onPauseClicked() : void
@@ -115,6 +118,9 @@ package "Controllers (UI)" {
     }
 
     class LibraryController {
+        - main : TunixApp
+        - library : Library
+        + LibraryController(main : TunixApp, library : Library)
         + draw() : void
         - fetchLibraryAssets() : List<ILibraryAsset>
         + getLibraryAssets() : List<ILibraryAsset>
@@ -123,6 +129,8 @@ package "Controllers (UI)" {
     }
 
     class TopBarController {
+        - main : TunixApp
+        + TopBarController(main : TunixApp)
         + draw() : void
         + onHomeClicked() : void
         + onSearchClicked() : void
@@ -130,8 +138,13 @@ package "Controllers (UI)" {
     }
 
     class PlaylistController {
+        - main : TunixApp
+        - playlist : Playlist
+        + PlaylistController(main : TunixApp, playlist : Playlist)
         + draw() : void
-        
+        + onSongClicked(song : Song) : void
+        + onRemoveSongClicked(song : Song) : void
+        + addSong(song : Song) : void
     }
 
     class ProfileController {
@@ -187,10 +200,10 @@ View <|.. ProfileView
 MusicPlayerController -- MusicPlayer
 MusicPlayerView -- MusicPlayerController
 
-MainController -- MusicPlayerController
-MainController -- ProfileController
-MainController -- HomeController
-MainController -- LibraryController
+TunixApp -- MusicPlayerController
+TunixApp -- ProfileController
+TunixApp -- HomeController
+TunixApp -- LibraryController
 
 ProfileView -- ProfileController
 ProfileController -- User
@@ -200,12 +213,12 @@ HomeView -- HomeController
 LibraryView -- LibraryController
 
 PlaylistView -- PlaylistController
-PlaylistController -- MainController
+PlaylistController -- TunixApp
 
 TopBarView -- TopBarController
-TopBarController -- MainController
+TopBarController -- TunixApp
 
-MainController -- Account
+TunixApp -- Account
 
 ' =====================
 ' SPRING BACKEND
