@@ -17,10 +17,16 @@ package "Model (Entities)" {
     class User
     class Artist
     class Admin
+    class ArtistRequest
 
     Account <|-- User
     Account <|-- Artist
     Account <|-- Admin
+
+    interface ILibraryAsset
+    Song ..|> ILibraryAsset
+    Album ..|> ILibraryAsset
+    Playlist ..|> ILibraryAsset
 
     ' -------- MUSIC CORE --------
     class Song
@@ -41,7 +47,10 @@ package "Model (Entities)" {
     Playlist "0..*" -- "0..*" Song
 
     ' -------- LIBRARY --------
-    class Library
+    class Library {
+        - assets : List<ILibraryAsset>
+        + getAssets() : List<ILibraryAsset>
+    }
 
     User "1" *-- "1" Library
 
@@ -65,15 +74,20 @@ package "Model (Entities)" {
 ' =====================
 
 package "Controllers (UI)" {
-    interface IController{
-        public draw() : void
+
+    interface IController {
+        + draw() : void
     }
-    class MainController{
-        - {static} current :  IController
-        + {static} main (args : String[]) : void
+
+    class MainController {
+        - {static} current : IController
+
+        + {static} main(args : String[]) : void
         + {static} initialize() : void
-        - {static} drawPersistenElements() : void
+
+        - {static} drawPersistentElements() : void
         - {static} drawCenter() : void
+
         + onPlaylistClicked() : void
         + onAlbumClicked() : void
         + onSongClicked() : void
@@ -81,7 +95,8 @@ package "Controllers (UI)" {
         + onSearchClicked() : void
         + onProfileClicked() : void
     }
-    class MusicPlayerController{
+
+    class MusicPlayerController {
         + draw() : void
         + onPlayClicked() : void
         + onPauseClicked() : void
@@ -90,41 +105,51 @@ package "Controllers (UI)" {
         + onVolumeChanged() : void
         + onShuffleClicked() : void
         + onRepeatClicked() : void
-        'Work in progress'
+
+        ' Work in progress
         + onQueueClicked() : void
     }
-    class HomeController{
-        +draw() : void
-    }
-    class LibraryController{
+
+    class HomeController {
         + draw() : void
+    }
+
+    class LibraryController {
+        + draw() : void
+
         + onPlaylistClicked() : void
         + onAlbumClicked() : void
         + onSongClicked() : void
+
         + onPlaylistRightClicked() : void
         + onAlbumRightClicked() : void
         + onSongRightClicked() : void
     }
-    class TopBarController{
+
+    class TopBarController {
         + onHomeClicked() : void
         + onSearchClicked() : void
         + onProfileClicked() : void
     }
-    class PlaylistController{
-        + draw() : void
 
+    class PlaylistController {
+        + draw() : void
     }
-    class ProfileController{
+
+    class ProfileController {
         + draw() : void
     }
 }
 
 package "Views" {
+
     interface View
     interface ILibraryAssetView
+
     class LibraryPlaylistView
     class LibraryAlbumView
     class LibrarySongView
+
     class MusicPlayerView
     class HomeView
     class LibraryView
@@ -133,12 +158,20 @@ package "Views" {
     class ProfileView
 }
 
+' =====================
+' VIEW RELATIONS
+' =====================
+
 LibraryPlaylistView ..|> ILibraryAssetView
 LibraryAlbumView ..|> ILibraryAssetView
 LibrarySongView ..|> ILibraryAssetView
-ILibraryAssetView --> LibraryView
 
-' UI links
+LibraryView o-- ILibraryAssetView
+
+' =====================
+' UI LINKS
+' =====================
+
 MusicPlayerController ..|> IController
 HomeController ..|> IController
 LibraryController ..|> IController
@@ -155,21 +188,25 @@ View <|.. ProfileView
 
 MusicPlayerController -- MusicPlayer
 MusicPlayerView -- MusicPlayerController
+
 MainController -- MusicPlayerController
 MainController -- ProfileController
+MainController -- HomeController
+MainController -- LibraryController
+
 ProfileView -- ProfileController
 ProfileController -- User
+
 HomeView -- HomeController
-MainController -- HomeController
 
 LibraryView -- LibraryController
-MainController -- LibraryController
 
 PlaylistView -- PlaylistController
 PlaylistController -- MainController
 
 TopBarView -- TopBarController
 TopBarController -- MainController
+
 MainController -- Account
 
 ' =====================
@@ -178,8 +215,9 @@ MainController -- Account
 
 package "Spring Backend" {
 
-    ' Controllers (REST)
+    ' -------- CONTROLLERS (REST) --------
     interface API
+
     class AccountControllerAPI
     class UserControllerAPI
     class ArtistControllerAPI
@@ -192,8 +230,9 @@ package "Spring Backend" {
     class ListeningHistoryControllerAPI
     class ArtistRequestControllerAPI
 
-    ' Services
+    ' -------- SERVICES --------
     interface Service
+
     class AccountService
     class UserService
     class ArtistService
@@ -206,8 +245,9 @@ package "Spring Backend" {
     class ListeningHistoryService
     class ArtistRequestService
 
-    ' Repositories (JPA)
+    ' -------- REPOSITORIES --------
     interface JpaRepository
+
     class AccountRepository
     class UserRepository
     class ArtistRepository
@@ -221,7 +261,9 @@ package "Spring Backend" {
     class ArtistRequestRepository
 }
 
-' Implementations
+' =====================
+' IMPLEMENTATIONS
+' =====================
 
 API <|.. AccountControllerAPI
 API <|.. UserControllerAPI
@@ -259,16 +301,24 @@ JpaRepository <|.. GenreRepository
 JpaRepository <|.. ListeningHistoryRepository
 JpaRepository <|.. ArtistRequestRepository
 
-' Controller → Service
+' =====================
+' CONTROLLER → ENTITY/SERVICE
+' =====================
+
 AccountControllerAPI -- Account
 UserControllerAPI -- User
-AdminControllerAPI -- Admin
-AccountControllerAPI -- AccountService
 ArtistControllerAPI -- Artist
+AdminControllerAPI -- Admin
+
+SongControllerAPI -- Song
 AlbumControllerAPI -- Album
 GenreControllerAPI -- Genre
-SongControllerAPI -- Song
 ListeningHistoryControllerAPI -- ListeningHistory
+PlaylistControllerAPI -- Playlist
+LibraryControllerAPI -- Library
+ArtistRequestControllerAPI -- ArtistRequest
+
+AccountControllerAPI -- AccountService
 UserControllerAPI -- UserService
 ArtistControllerAPI -- ArtistService
 AdminControllerAPI -- AdminService
@@ -280,7 +330,10 @@ GenreControllerAPI -- GenreService
 ListeningHistoryControllerAPI -- ListeningHistoryService
 ArtistRequestControllerAPI -- ArtistRequestService
 
-' Service → Repository
+' =====================
+' SERVICE → REPOSITORY
+' =====================
+
 AccountService -- AccountRepository
 UserService -- UserRepository
 ArtistService -- ArtistRepository
@@ -293,11 +346,16 @@ GenreService -- GenreRepository
 ListeningHistoryService -- ListeningHistoryRepository
 ArtistRequestService -- ArtistRequestRepository
 
+' =====================
+' EXTRA LINKS
+' =====================
 
 PlaylistController -- Playlist
 LibraryController -- Library
+
 Library -- LibraryControllerAPI
 Playlist -- PlaylistControllerAPI
+
 User -- ArtistRequestControllerAPI
 
 @enduml
