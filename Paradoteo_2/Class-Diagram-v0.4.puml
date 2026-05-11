@@ -121,6 +121,10 @@ package "Controllers (UI)" {
 
 package "Views" {
     interface View
+    interface ILibraryAssetView
+    class LibraryPlaylistView
+    class LibraryAlbumView
+    class LibrarySongView
     class MusicPlayerView
     class HomeView
     class LibraryView
@@ -129,13 +133,18 @@ package "Views" {
     class ProfileView
 }
 
+LibraryPlaylistView ..|> ILibraryAssetView
+LibraryAlbumView ..|> ILibraryAssetView
+LibrarySongView ..|> ILibraryAssetView
+ILibraryAssetView --> LibraryView
+
 ' UI links
-MusicPlayerController ..|> Controller
-HomeController ..|> Controller
-LibraryController ..|> Controller
-TopBarController ..|> Controller
-PlaylistController ..|> Controller
-ProfileController ..|> Controller
+MusicPlayerController ..|> IController
+HomeController ..|> IController
+LibraryController ..|> IController
+TopBarController ..|> IController
+PlaylistController ..|> IController
+ProfileController ..|> IController
 
 View <|.. MusicPlayerView
 View <|.. HomeView
