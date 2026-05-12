@@ -23,35 +23,31 @@ package "Frontend" {
 ' -------- ACCOUNT HIERARCHY --------
     abstract class Account {
         # id : String
+        # name: String
+        # email: String
         # status : Boolean
     }
     class User {
-        + fetchUserProfile(userId : int) : User
-        + postArtistRequest() : void
-        + getUserStatus() : Boolean
-        + followArtist(artistId : String) : void
+        # displayName: String
     }
+
     class Artist {
-        + fetchArtist(searchName : String) : List<Artist>
-        + fetchSongWarnings(songId : int) : List<String>
-        + postIssueWarning() : Boolean
-        + postBan() : Boolean
-        + checkDuplicateSong() : Boolean
+        - bio : String
+        - followersCount : int
     }
+
     class Admin {
-        + fetchArtistApplications() : List<ArtistRequest>
-        + postRejectResponse(applicationId : int) : String
-        + postApproveResponse(applicationId : int) : String
+        
     }
     class ArtistRequest{
         - userId : String
         - status : String
         --
-        + ArtistRequest(userId : String)
         + getUserId() : String
         + getStatus() : String
     }
 
+    class LibraryAsset
     User "1"-->"0...1" ArtistRequest : files
     Admin --> ArtistRequest : inspects
 
@@ -59,11 +55,9 @@ package "Frontend" {
     Account <|-- Artist
     Account <|-- Admin
 
-    interface ILibraryAsset<T extends ILibraryAsset<T>> {
-        # title : String
-        # id : int
-        --
-        + fetch(searchName : String) : List<T>
+    interface ILibraryAsset {
+        + getTitle() : String
+        + getId() : int
     }
 
     Song ..|> ILibraryAsset
@@ -79,10 +73,6 @@ package "Frontend" {
         + getTitle() : String
         + getArtist() : Artist
         + getGenres() : List<String>
-        + postRemoveSong(songId : int) : Boolean
-        + fetchSongByPlId(plId : int) : List<Song>
-        + fetchSong() : Boolean
-        + postSong() : Boolean
     }
 
     class Album
@@ -94,22 +84,13 @@ package "Frontend" {
 
     ' -------- PLAYLIST SYSTEM --------
     class Playlist {
-        # songs : List<Song>
-        # creator : User
+        - songs : List<Song>
+        - creator : User
         - coauthors : List<User>
-        --
-        + Playlist(creator : User)
-        + Playlist(creator : User, coauthors : List<User>)
+
         + getSongs() : List<Song>
         + getCreator() : User
         + getCoauthors() : List<User>
-        # sendHTTPRequest() : Boolean
-        # postRemoveSongById(songId : int, playlistId : int) : void
-        # checkSongExists(songId : int) : Boolean
-        + findByUserId(userId : int) : List<Playlist>
-        + getSongsByPlaylistId(playlistId : int) : List<Song>
-        + addSong(plId : int, songId : int) : Boolean
-        + addToFavorites(songId : int, userId : int) : Boolean
     }
 
     User "1" --> "0..*" Playlist : owns
@@ -119,14 +100,11 @@ package "Frontend" {
     ' -------- LIBRARY --------
     class Library {
         - assets : List<ILibraryAsset>
-        + getAssets() : List<ILibraryAsset>
     }
 
     User "1" *-- "1" Library
 
-    Library "0..*" --> Song
-    Library "0..*" --> Album
-    Library "0..*" --> Playlist
+    Library -- ILibraryAsset
 
     ' -------- LISTENING HISTORY --------
     class ListeningHistory { 
@@ -134,12 +112,6 @@ package "Frontend" {
         - Playlists : Playlist[]
         - Albums : Album[]
         --
-        + getSongs() : Song[]
-        + addSong(song : Song) : void
-        + getPlaylists() : Playlist[]
-        + addPlaylist(pl : Playlist) : void
-        + getAlbums() : Album[]
-        + addAlbum(al : Album) : void
     }
 
     User "1" --> "0..*" ListeningHistory
@@ -147,21 +119,13 @@ package "Frontend" {
     ListeningHistory o-- Playlist
     ListeningHistory o-- Album
 
-    ' -------- PLAYER --------
-    class MusicPlayer {
-        - q : Queue<Song>
-        --
-        + getQueue() : Queue<Song>
-        + playMusic(song : Song) : void
-        + predictNext() : void 
+    class Favorites {
+        - songs : List<Song>
     }
-    MusicPlayer --> Song
 
-    class Favorites 
-
-    Favorites --|> Playlist
-    Favorites --* User
-    }
+    User "1" *-- "1" Favorites
+    Favorites o-- Song
+}
 
     ' =====================================================
     ' VIEW LAYER
@@ -185,6 +149,8 @@ package "Frontend" {
         class PlaylistView
         class ArtistView
         class LoginView
+        class UserProfileView
+        class AdminView
 
         ' Library sub views
         class LibrarySongView
@@ -199,7 +165,8 @@ package "Frontend" {
         View <|.. PlaylistView
         View <|.. ArtistView
         View <|.. LoginView
-
+        View <|.. UserProfileView
+        View <|.. AdminView
         View <|.. LibraryView
 
         LibraryAssetView <|.. LibrarySongView
@@ -221,7 +188,7 @@ package "Frontend" {
         class TopBarController
         class MusicPlayerController
         class LibraryController
-
+        class AdminController
         class HomeController
         class SearchController
         class SongController
@@ -229,6 +196,7 @@ package "Frontend" {
         class PlaylistController
         class ArtistController
         class LoginController
+        class UserProfileController
     }
 
     ' =====================================================
@@ -237,10 +205,145 @@ package "Frontend" {
 
     package "Service Layer" {
 
-        class LibraryService
-        class PlaybackService
+        class ListeningHistoryService {
+            + addSong(song : Song) : void
+            + addPlaylist(pl : Playlist) : void
+            + addAlbum(al : Album) : void
+            + getHistory(userId) : List<ILibraryAsset>
+        }
+
+        class LibraryService {
+
+            + getLibrary(userId : int) : Library
+
+            + getAssets(userId : int) : List<ILibraryAsset>
+
+            + addAsset(userId : int, assetId : int) : void
+
+            + removeAsset(userId : int, assetId : int) : void
+        }
+
+        class PlaybackService {
+            - currentSong : Song
+            - queue : List<Song>
+            - volume : int
+            - playing : boolean
+
+            + playSong(song : Song) : void
+            + pauseSong() : void
+            + resumeSong() : void
+            + stopSong() : void
+
+            + nextSong() : void
+            + previousSong() : void
+
+            + addToQueue(song : Song) : void
+            + removeFromQueue(song : Song) : void
+            + clearQueue() : void
+
+            + setVolume(volume : int) : void
+
+            + getCurrentSong() : Song
+            + getQueue() : List<Song>
+
+            + isPlaying() : boolean
+        }
         class SearchService
-        class LoginService
+
+        class LoginService {
+
+            - currentUser : User
+            - authToken : String
+
+            + login(email : String, password : String) : User
+            + register(name : String, email : String, password : String) : User
+            + logout() : void
+
+            + isLoggedIn() : boolean
+            + getCurrentUser() : User
+        }
+
+        class UserService {
+
+            + getUserById(userId : int) : User
+
+            + getUserProfile(userId : int) : User
+
+            + updateUserProfile(user : User) : void
+
+            + deactivateUser(userId : int) : void
+        }
+
+
+        class ArtistRequestService {
+
+            + submitRequest(userId : int) : void
+
+            + getRequests() : List<ArtistRequest>
+
+            + approveRequest(requestId : int) : void
+
+            + rejectRequest(requestId : int) : void
+        }
+        
+        class FollowService {
+
+            + followArtist(userId : int, artistId : int) : void
+
+            + unfollowArtist(userId : int, artistId : int) : void
+
+            + getFollowedArtists(userId : int) : List<Artist>
+
+            + isFollowing(userId : int, artistId : int) : boolean
+        }
+
+        class PlaylistService {
+
+            + getPlaylist(playlistId : int) : Playlist
+
+            + findByUserId(userId : int) : List<Playlist>
+
+            + getSongsByPlaylistId(playlistId : int) : List<Song>
+
+            + createPlaylist(name : String, creatorId : int) : Playlist
+
+            + deletePlaylist(playlistId : int) : Boolean
+
+            + addSong(playlistId : int, songId : int) : Boolean
+
+            + removeSong(playlistId : int, songId : int) : Boolean
+
+            + addCoauthor(playlistId : int, userId : int) : Boolean
+
+            + removeCoauthor(playlistId : int, userId : int) : Boolean
+
+            + renamePlaylist(playlistId : int, name : String) : Boolean
+        }
+
+        class SongService {
+
+            + getSongById(songId : int) : Song
+
+            + getSongsByPlaylist(plId : int) : List<Song>
+
+            + createSong(song : Song) : Song
+
+            + deleteSong(songId : int) : Boolean
+
+            + checkDuplicateSong() : void
+        }
+
+        class AdminService {
+            + postIssueWarning() : Boolean
+            + postBan() : Boolean
+            + postRejectResponse(applicationId : int) : String
+            + postApproveResponse(applicationId : int) : String
+            + getSongWarnings(songId : int) : List<String>
+        }
+
+        class ArtistService {
+            + getArtist(searchName : String) : List<Artist>
+        }
     }
 
     ' =====================================================
@@ -256,6 +359,10 @@ package "Frontend" {
         class AlbumAPI
         class LibraryAPI
         class UserAPI
+        class AdminAPI
+        class LoginAPI
+        class ArtistAPI
+        class ArtistRequestAPI
     }
 
     ' =====================================================
@@ -273,6 +380,7 @@ package "Frontend" {
         class ShowSongEvent
         class ShowAlbumEvent
         class PlaySongEvent
+        class LoginEvent
 
         Event <|-- ShowHomeEvent
         Event <|-- ShowSearchEvent
@@ -280,6 +388,7 @@ package "Frontend" {
         Event <|-- ShowSongEvent
         Event <|-- ShowAlbumEvent
         Event <|-- PlaySongEvent
+        Event <|-- LoginEvent
     }
 
     ' =====================================================
@@ -305,6 +414,9 @@ package "Frontend" {
     LibraryView -- LibraryController
     TopBarView -- TopBarController
     MusicPlayerView -- MusicPlayerController
+    UserProfileView -- UserProfileController
+    AdminView -- AdminController
+
 
     ' =====================================================
     ' CONTROLLER → SERVICE
@@ -315,6 +427,17 @@ package "Frontend" {
     LoginController -- LoginService
     LibraryController -- LibraryService
     MusicPlayerController -- PlaybackService
+    UserProfileController -- UserService
+    AdminController -- AdminService
+    UserProfileController -- ArtistRequestService
+
+    ArtistController -- FollowService
+    ArtistController -- ArtistService
+
+    PlaylistController -- PlaylistService
+    LibraryController -- PlaylistService
+
+    SongController -- SongService
 
     ' =====================================================
     ' SERVICE → API
@@ -331,6 +454,21 @@ package "Frontend" {
     PlaybackService -- PlaylistAPI
 
     LoginService -- UserAPI
+    UserService -- UserAPI
+
+    AdminService -- AdminAPI
+
+    PlaylistAPI -- PlaylistService
+
+    FollowService -- UserAPI
+
+    LoginService -- LoginAPI
+
+    ArtistService -- ArtistAPI
+
+    ArtistRequestService -- ArtistRequestAPI
+
+    SongService -- SongAPI
 
     ' =====================================================
     ' API → CLIENT
@@ -341,6 +479,11 @@ package "Frontend" {
     AlbumAPI -- ApiClient
     LibraryAPI -- ApiClient
     UserAPI -- ApiClient
+    ArtistAPI -- ApiClient
+    LoginAPI -- ApiClient
+    ArtistRequestAPI -- ApiClient
+    AdminAPI -- ApiClient
+
 
     ' =====================================================
     ' EVENT SYSTEM USAGE
@@ -352,6 +495,7 @@ package "Frontend" {
     SongController ..> EventBus : publish
     AlbumController ..> EventBus : publish
     LibraryController ..> EventBus : publish
+    LoginController ..> EventBus : publish
 
     MusicPlayerController ..> EventBus : subscribe
 
@@ -363,6 +507,7 @@ package "Frontend" {
     LibraryService -- LibraryAsset
     PlaybackService -- Song
     LoginService -- Account
+    UserService -- Account
 
 }
  
@@ -373,7 +518,7 @@ package "Spring Backend" <<External System>> {
 ' DOMAIN LAYER (ENTITIES)
 ' =====================================================
 
-package "Domain (Entities)" {
+package "Domain (Entities)" as E {
 
     class Account
     class User
@@ -414,11 +559,10 @@ package "DTO Layer" {
 ' CONTROLLER LAYER (REST API)
 ' =====================================================
 
-package "Controller Layer (REST)" {
+package "Controller Layer (REST)" as C{
 
     interface API
 
-    class AccountControllerAPI
     class UserControllerAPI
     class ArtistControllerAPI
     class AdminControllerAPI
@@ -428,28 +572,28 @@ package "Controller Layer (REST)" {
     class LibraryControllerAPI
     class ListeningHistoryControllerAPI
     class ArtistRequestControllerAPI
+
+    API <|.. UserControllerAPI
+    API <|.. ArtistControllerAPI
+    API <|.. AdminControllerAPI
+    API <|.. SongControllerAPI
+    API <|.. AlbumControllerAPI
+    API <|.. PlaylistControllerAPI
+    API <|.. LibraryControllerAPI
+    API <|.. ListeningHistoryControllerAPI
+    API <|.. ArtistRequestControllerAPI
 }
 
-API <|.. AccountControllerAPI
-API <|.. UserControllerAPI
-API <|.. ArtistControllerAPI
-API <|.. AdminControllerAPI
-API <|.. SongControllerAPI
-API <|.. AlbumControllerAPI
-API <|.. PlaylistControllerAPI
-API <|.. LibraryControllerAPI
-API <|.. ListeningHistoryControllerAPI
-API <|.. ArtistRequestControllerAPI
+
 
 ' =====================================================
 ' SERVICE LAYER
 ' =====================================================
 
-package "Service Layer" {
+package "Service Layer" as S{
 
     interface Service
 
-    class AccountService
     class UserService
     class ArtistService
     class AdminService
@@ -459,18 +603,19 @@ package "Service Layer" {
     class LibraryService
     class ListeningHistoryService
     class ArtistRequestService
+
+    Service <|.. UserService
+    Service <|.. ArtistService
+    Service <|.. AdminService
+    Service <|.. SongService
+    Service <|.. AlbumService
+    Service <|.. PlaylistService
+    Service <|.. LibraryService
+    Service <|.. ListeningHistoryService
+    Service <|.. ArtistRequestService
 }
 
-Service <|.. AccountService
-Service <|.. UserService
-Service <|.. ArtistService
-Service <|.. AdminService
-Service <|.. SongService
-Service <|.. AlbumService
-Service <|.. PlaylistService
-Service <|.. LibraryService
-Service <|.. ListeningHistoryService
-Service <|.. ArtistRequestService
+
 
 ' =====================================================
 ' REPOSITORY LAYER
@@ -480,7 +625,6 @@ package "Repository Layer (JPA)" {
 
     interface JpaRepository
 
-    class AccountRepository
     class UserRepository
     class ArtistRepository
     class AdminRepository
@@ -490,54 +634,53 @@ package "Repository Layer (JPA)" {
     class LibraryRepository
     class ListeningHistoryRepository
     class ArtistRequestRepository
+
+    JpaRepository <|.. UserRepository
+    JpaRepository <|.. ArtistRepository
+    JpaRepository <|.. AdminRepository
+    JpaRepository <|.. SongRepository
+    JpaRepository <|.. AlbumRepository
+    JpaRepository <|.. PlaylistRepository
+    JpaRepository <|.. LibraryRepository
+    JpaRepository <|.. ListeningHistoryRepository
+    JpaRepository <|.. ArtistRequestRepository
+
 }
 
-JpaRepository <|.. AccountRepository
-JpaRepository <|.. UserRepository
-JpaRepository <|.. ArtistRepository
-JpaRepository <|.. AdminRepository
-JpaRepository <|.. SongRepository
-JpaRepository <|.. AlbumRepository
-JpaRepository <|.. PlaylistRepository
-JpaRepository <|.. LibraryRepository
-JpaRepository <|.. ListeningHistoryRepository
-JpaRepository <|.. ArtistRequestRepository
+
 
 ' =====================================================
 ' FLOW: CONTROLLER → SERVICE
 ' =====================================================
 
-SongControllerAPI -- SongService
-PlaylistControllerAPI -- PlaylistService
-AlbumControllerAPI -- AlbumService
-UserControllerAPI -- UserService
-ArtistControllerAPI -- ArtistService
-LibraryControllerAPI -- LibraryService
-AccountControllerAPI -- AccountService
+SongControllerAPI -- S.SongService
+PlaylistControllerAPI -- S.PlaylistService
+AlbumControllerAPI -- S.AlbumService
+UserControllerAPI -- S.UserService
+ArtistControllerAPI -- S.ArtistService
+LibraryControllerAPI -- S.LibraryService
 
 ' =====================================================
 ' FLOW: SERVICE → REPOSITORY
 ' =====================================================
 
-SongService -- SongRepository
-PlaylistService -- PlaylistRepository
-AlbumService -- AlbumRepository
-UserService -- UserRepository
-ArtistService -- ArtistRepository
-LibraryService -- LibraryRepository
-AccountService -- AccountRepository
+S.SongService -- SongRepository
+S.PlaylistService -- PlaylistRepository
+S.AlbumService -- AlbumRepository
+S.UserService -- UserRepository
+S.ArtistService -- ArtistRepository
+S.LibraryService -- LibraryRepository
 
 ' =====================================================
 ' SERVICE → DOMAIN
 ' =====================================================
 
-SongService -- Song
-PlaylistService -- Playlist
-AlbumService -- Album
-UserService -- User
-LibraryService -- Library
-ArtistService -- Artist
-AccountService -- Account
+S.SongService .. E.Song
+S.PlaylistService .. E.Playlist
+S.AlbumService .. E.Album
+S.UserService .. E.User
+S.LibraryService .. E.Library
+S.ArtistService .. E.Artist
 
 ' =====================================================
 ' CONTROLLER → DTO
@@ -558,5 +701,8 @@ SongAPI -- SongControllerAPI
 PlaylistAPI -- PlaylistControllerAPI
 LibraryAPI -- LibraryControllerAPI
 UserAPI -- UserControllerAPI
+ArtistRequestAPI -- ArtistRequestControllerAPI
+ArtistAPI -- ArtistControllerAPI
+AdminAPI -- AdminControllerAPI
 }
 @enduml
