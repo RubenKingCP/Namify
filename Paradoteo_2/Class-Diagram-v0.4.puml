@@ -73,15 +73,11 @@ package "Model (Entities)" {
         + getGenres() : List<String>
         + postRemoveSong(songId : int) : Boolean
         + fetchSongByPlId(plId : int) : List<Song>
-        + fetchSong(searchName : String) : List<Song>
         + fetchSong() : Boolean
         + postSong() : Boolean
     }
 
-    class Album {
-        
-        + fetchAlbum(searchName : String) : List<Album>
-    }
+    class Album
 
     Artist "1" --> "0..*" Song : creates
     Artist "1" --> "0..*" Album : creates
@@ -104,7 +100,6 @@ package "Model (Entities)" {
         # checkSongExists(songId : int) : Boolean
         + findByUserId(userId : int) : List<Playlist>
         + getSongsByPlaylistId(playlistId : int) : List<Song>
-        + fetchPlaylist(searchName : String) : List<Playlist>
         + addSong(plId : int, songId : int) : Boolean
         + addToFavorites(songId : int, userId : int) : Boolean
     }
