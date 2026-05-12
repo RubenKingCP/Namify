@@ -14,8 +14,8 @@ package "Model (Entities)" {
 
     ' -------- ACCOUNT HIERARCHY --------
     abstract class Account {
-        ~ id : String
-        ~ status : Boolean
+        # id : String
+        # status : Boolean
     }
     class User {
         + fetchUserProfile(userId : int) : User
@@ -37,42 +37,71 @@ package "Model (Entities)" {
     }
     class ArtistRequest{
         - userId : String
+        - status : String
+        --
+        + ArtistRequest(userId : String)
+        + getUserId() : String
+        + getStatus() : String
     }
+
+    User "1"-->"0...1" ArtistRequest : files
+    Admin --> ArtistRequest : inspects
 
     Account <|-- User
     Account <|-- Artist
     Account <|-- Admin
 
-    interface ILibraryAsset
+    interface ILibraryAsset<T extends ILibraryAsset<T>> {
+        # title : String
+        # id : int
+        --
+        + fetch(searchName : String) : List<T>
+    }
+
     Song ..|> ILibraryAsset
     Album ..|> ILibraryAsset
     Playlist ..|> ILibraryAsset
 
     ' -------- MUSIC CORE --------
     class Song {
+        - artist : List<Artist> 
+        - genre : List<String>
+        --
+        + Song(title : String, artist : List<Artist>, genres : List<String>)
+        + getTitle() : String
+        + getArtist() : Artist
+        + getGenres() : List<String>
         + postRemoveSong(songId : int) : Boolean
         + fetchSongByPlId(plId : int) : List<Song>
         + fetchSong(searchName : String) : List<Song>
         + fetchSong() : Boolean
         + postSong() : Boolean
     }
+
     class Album {
+        
         + fetchAlbum(searchName : String) : List<Album>
     }
-    class Genre
 
     Artist "1" --> "0..*" Song : creates
     Artist "1" --> "0..*" Album : creates
 
     Album "1" *-- "1..*" Song
 
-    Song "0..*" -- "0..*" Genre
-
     ' -------- PLAYLIST SYSTEM --------
     class Playlist {
-        - sendHTTPRequest() : Boolean
-        - postRemoveSongById(songId : int, playlistId : int) : void
-        - checkSongExists(songId : int) : Boolean
+        # songs : List<Song>
+        # creator : User
+        - coauthors : List<User>
+        --
+        + Playlist(creator : User)
+        + Playlist(creator : User, coauthors : List<User>)
+        + getSongs() : List<Song>
+        + getCreator() : User
+        + getCoauthors() : List<User>
+        # sendHTTPRequest() : Boolean
+        # postRemoveSongById(songId : int, playlistId : int) : void
+        # checkSongExists(songId : int) : Boolean
         + findByUserId(userId : int) : List<Playlist>
         + getSongsByPlaylistId(playlistId : int) : List<Song>
         + fetchPlaylist(searchName : String) : List<Playlist>
@@ -81,7 +110,8 @@ package "Model (Entities)" {
     }
 
     User "1" --> "0..*" Playlist : owns
-    Playlist "0..*" -- "0..*" Song
+    Playlist "0..*" o-- "0..*" Song
+    'Album --|> Playlist
 
     ' -------- LIBRARY --------
     class Library {
@@ -96,14 +126,38 @@ package "Model (Entities)" {
     Library "0..*" --> Playlist
 
     ' -------- LISTENING HISTORY --------
-    class ListeningHistory
+    class ListeningHistory { 
+        - songs : Song[]
+        - Playlists : Playlist[]
+        - Albums : Album[]
+        --
+        + getSongs() : Song[]
+        + addSong(song : Song) : void
+        + getPlaylists() : Playlist[]
+        + addPlaylist(pl : Playlist) : void
+        + getAlbums() : Album[]
+        + addAlbum(al : Album) : void
+    }
 
     User "1" --> "0..*" ListeningHistory
-    ListeningHistory --> Song
+    ListeningHistory o-- Song
+    ListeningHistory o-- Playlist
+    ListeningHistory o-- Album
 
     ' -------- PLAYER --------
-    class MusicPlayer
+    class MusicPlayer {
+        - q : Queue<Song>
+        --
+        + getQueue() : Queue<Song>
+        + playMusic(song : Song) : void
+        + predictNext() : void 
+    }
     MusicPlayer --> Song
+
+    class Favorites 
+
+    Favorites --|> Playlist
+    Favorites --* User
 }
 
 ' =====================
@@ -307,7 +361,6 @@ package "Spring Backend" {
     class AlbumControllerAPI
     class PlaylistControllerAPI
     class LibraryControllerAPI
-    class GenreControllerAPI
     class ListeningHistoryControllerAPI
     class ArtistRequestControllerAPI
 
@@ -322,7 +375,6 @@ package "Spring Backend" {
     class AlbumService
     class PlaylistService
     class LibraryService
-    class GenreService
     class ListeningHistoryService
     class ArtistRequestService
 
@@ -337,7 +389,6 @@ package "Spring Backend" {
     class AlbumRepository
     class PlaylistRepository
     class LibraryRepository
-    class GenreRepository
     class ListeningHistoryRepository
     class ArtistRequestRepository
 }
@@ -354,7 +405,6 @@ API <|.. SongControllerAPI
 API <|.. AlbumControllerAPI
 API <|.. PlaylistControllerAPI
 API <|.. LibraryControllerAPI
-API <|.. GenreControllerAPI
 API <|.. ListeningHistoryControllerAPI
 API <|.. ArtistRequestControllerAPI
 
@@ -366,7 +416,6 @@ Service <|.. SongService
 Service <|.. AlbumService
 Service <|.. PlaylistService
 Service <|.. LibraryService
-Service <|.. GenreService
 Service <|.. ListeningHistoryService
 Service <|.. ArtistRequestService
 
@@ -378,7 +427,6 @@ JpaRepository <|.. SongRepository
 JpaRepository <|.. AlbumRepository
 JpaRepository <|.. PlaylistRepository
 JpaRepository <|.. LibraryRepository
-JpaRepository <|.. GenreRepository
 JpaRepository <|.. ListeningHistoryRepository
 JpaRepository <|.. ArtistRequestRepository
 
@@ -393,7 +441,6 @@ AdminControllerAPI -- Admin
 
 SongControllerAPI -- Song
 AlbumControllerAPI -- Album
-GenreControllerAPI -- Genre
 ListeningHistoryControllerAPI -- ListeningHistory
 PlaylistControllerAPI -- Playlist
 LibraryControllerAPI -- Library
@@ -407,7 +454,6 @@ SongControllerAPI -- SongService
 AlbumControllerAPI -- AlbumService
 PlaylistControllerAPI -- PlaylistService
 LibraryControllerAPI -- LibraryService
-GenreControllerAPI -- GenreService
 ListeningHistoryControllerAPI -- ListeningHistoryService
 ArtistRequestControllerAPI -- ArtistRequestService
 
@@ -423,7 +469,6 @@ SongService -- SongRepository
 AlbumService -- AlbumRepository
 PlaylistService -- PlaylistRepository
 LibraryService -- LibraryRepository
-GenreService -- GenreRepository
 ListeningHistoryService -- ListeningHistoryRepository
 ArtistRequestService -- ArtistRequestRepository
 
