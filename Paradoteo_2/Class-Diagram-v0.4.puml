@@ -151,7 +151,10 @@ package "Controllers (UI)" {
     }
 
     class HomeController {
+        - main : TunixApp
+        + HomeController(main : TunixApp)
         + draw() : void
+        
     }
 
     class LibraryController {
@@ -185,6 +188,11 @@ package "Controllers (UI)" {
     }
 
     class ProfileController {
+        - main : TunixApp
+        - user : User
+        + ProfileController(main : TunixApp, user : User)
+        + OnSettingsClicked() : void
+        + OnLogoutClicked() : void
         + draw() : void
     }
 }
@@ -198,12 +206,37 @@ package "Views" {
     class LibraryAlbumView
     class LibrarySongView
 
-    class MusicPlayerView
+    class MusicPlayerView{
+        + onPlayClicked() : void
+        + onPauseClicked() : void
+        + onNextClicked() : void
+        + onPreviousClicked() : void
+        + onVolumeChanged() : void
+        + onShuffleClicked() : void
+        + onRepeatClicked() : void
+
+        'WIP'
+        + onQueueClicked() : void
+    }
     class HomeView
-    class LibraryView
-    class TopBarView
-    class PlaylistView
-    class ProfileView
+    class LibraryView{
+        + onAssetClicked(asset : ILibraryAsset) : void
+        + onAssetRightClicked(asset : ILibraryAsset) : void
+    }
+    class TopBarView{
+        + onHomeClicked() : void
+        + onSearchClicked() : void
+        + onProfileClicked() : void
+    }
+    class PlaylistView{
+        + onSongClicked(song : Song) : void
+        + onRemoveSongClicked(song : Song) : void
+        + addSong(song : Song) : void
+    }
+    class ProfileView{
+        + OnSettingsClicked() : void
+        + OnLogoutClicked() : void
+    }
 }
 
 ' =====================
