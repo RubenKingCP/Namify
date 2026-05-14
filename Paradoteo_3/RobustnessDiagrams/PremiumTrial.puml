@@ -1,0 +1,66 @@
+@startuml
+
+title Premium Trial
+
+left to right direction
+
+skinparam shadowing false
+skinparam roundcorner 10
+
+' =====================================================
+' ACTORS
+' =====================================================
+
+actor Γενικός_Χρήστης
+
+' =====================================================
+' BOUNDARY OBJECTS
+' =====================================================
+
+boundary Μενού_Πλοήγησης
+boundary Οθόνη_Premium_Πακέτων
+boundary Free_Trial_Button
+boundary Οθόνη_Επιτυχίας_Trial
+boundary Error_Trial_Popup
+
+
+
+' =====================================================
+' CONTROL OBJECTS
+' =====================================================
+
+control Επιλογή_Στοιχεία_Πλοήγησης
+control Διαδικασία_Trial
+control Ερώτηση_Αυτόματης_Ανανέωσης
+control Premium_Countdown
+control Check_Free_Trial
+
+' =====================================================
+' ENTITY OBJECTS
+' =====================================================
+
+entity Βάση_Δεδομένων
+entity Τραπεζικό_Σύστημα
+
+' =====================================================
+' INTERACTIONS
+' =====================================================
+Γενικός_Χρήστης --> Μενού_Πλοήγησης 
+Μενού_Πλοήγησης --> Επιλογή_Στοιχεία_Πλοήγησης
+Επιλογή_Στοιχεία_Πλοήγησης --> Οθόνη_Premium_Πακέτων
+Οθόνη_Premium_Πακέτων --> Check_Free_Trial
+Check_Free_Trial --> Free_Trial_Button : If Free_Trial = 0 ,show
+Γενικός_Χρήστης --> Free_Trial_Button
+Free_Trial_Button --> Διαδικασία_Trial 
+Διαδικασία_Trial --> Τραπεζικό_Σύστημα : Βασική Ροή Payment Through Bank Account 
+Διαδικασία_Trial --> Οθόνη_Επιτυχίας_Trial : Επιτυχής
+Οθόνη_Επιτυχίας_Trial --> Βάση_Δεδομένων : Set Premium, Set Free_Trial =1 , Set Plan_On_Renew = 0
+Διαδικασία_Trial --> Error_Trial_Popup : Ανεπιτυχής
+Error_Trial_Popup --> Γενικός_Χρήστης
+Error_Trial_Popup --> Οθόνη_Premium_Πακέτων
+' Δε ξέρω τι να βάλω για control εδώ, 150 render δεν έχουν νόημα
+Οθόνη_Επιτυχίας_Trial --> Ερώτηση_Αυτόματης_Ανανέωσης 
+Ερώτηση_Αυτόματης_Ανανέωσης -->  Βάση_Δεδομένων : Χρήστης έθεσε Plan_On_Renew = 0 ή όχι 0
+Ερώτηση_Αυτόματης_Ανανέωσης --> Premium_Countdown : Ξεκινά αντίστροφη μέτρηση, βλέπε Premium Management
+
+@enduml

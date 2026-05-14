@@ -1,0 +1,62 @@
+@startuml
+
+title Premium Management
+
+left to right direction
+
+skinparam shadowing false
+skinparam roundcorner 10
+
+' =====================================================
+' ACTORS
+' =====================================================
+
+actor Γενικός_Χρήστης
+
+' =====================================================
+' BOUNDARY OBJECTS
+' =====================================================
+
+boundary Οθόνη_Premium_Πακέτων
+boundary Premium_Countdown_Screen
+
+
+' =====================================================
+' CONTROL OBJECTS
+' =====================================================
+
+control Premium_Countdown
+control Check_Premium_State
+control Premium_Countdown_Screen_Options
+control Cancel_Automatic_Subscription
+control Change_Premium_Plan
+
+' =====================================================
+' ENTITY OBJECTS
+' =====================================================
+
+entity Βάση_Δεδομένων
+
+' =====================================================
+' INTERACTIONS
+' =====================================================
+
+
+Γενικός_Χρήστης --> Οθόνη_Premium_Πακέτων
+Οθόνη_Premium_Πακέτων --> Check_Premium_State
+Check_Premium_State --> Premium_Countdown_Screen : If Premium =/= 0, show
+Γενικός_Χρήστης --> Premium_Countdown_Screen 
+Premium_Countdown_Screen --> Premium_Countdown : Fetch countdown Timer
+Premium_Countdown_Screen --> Premium_Countdown_Screen_Options
+Premium_Countdown_Screen_Options --> Cancel_Automatic_Subscription
+Cancel_Automatic_Subscription --> Βάση_Δεδομένων : Set Plan_On_Renew = 0
+Premium_Countdown_Screen_Options --> Change_Premium_Plan 
+Change_Premium_Plan --> Βάση_Δεδομένων : Set Plan_On_Renew
+
+Premium_Countdown --> Check_Ερώτηση_Αυτόματης_Ανανέωσης_State : Premium Χρόνος Τελείωσε
+Check_Ερώτηση_Αυτόματης_Ανανέωσης_State --> Βάση_Δεδομένων : Fetch Plan_On_Renew
+Check_Ερώτηση_Αυτόματης_Ανανέωσης_State --> Revert_To_Free : If Plan_On_Renew == 0
+Check_Ερώτηση_Αυτόματης_Ανανέωσης_State --> Διαδικασία_Πληρωμής : If Plan_On_Renew =/= 0
+Revert_To_Free --> Βάση_Δεδομένων : Set Premium = 0
+
+@enduml
