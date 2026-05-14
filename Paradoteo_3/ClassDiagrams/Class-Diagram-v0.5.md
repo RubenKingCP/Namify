@@ -176,7 +176,7 @@ package "Frontend" {
         + OnLogoutClicked() : void
     }
         class AdminView
-
+        class RightClickMenuView
         ' Library sub views
         class LibrarySongView
         class LibraryAlbumView
@@ -193,6 +193,7 @@ package "Frontend" {
         View <|.. UserProfileView
         View <|.. AdminView
         View <|.. LibraryView
+        View <|.. RightClickMenuView
 
         LibraryAssetView <|.. LibrarySongView
         LibraryAssetView <|.. LibraryAlbumView
@@ -209,96 +210,107 @@ package "Frontend" {
     package "Controller Layer" {
 
          interface IController {
-        + draw() : void
+            + draw() : void
+        }
+
+        class TunixApp {
+            - {static} current : IController
+
+            + {static} main(args : String[]) : void
+            + {static} initialize() : void
+
+            - {static} drawPersistentElements() : void
+            - {static} drawCenter() : void
+
+            + onPlaylistClicked() : void
+            + onAlbumClicked() : void
+            + onSongClicked() : void
+            + onHomeClicked() : void
+            + onSearchClicked() : void
+            + onProfileClicked() : void
+        }
+
+        class MusicPlayerController {
+            - main : TunixApp
+            - player : MusicPlayer
+            + MusicPlayerController(main : TunixApp, player : MusicPlayer)
+            + draw() : void
+            + onPlayClicked() : void
+            + onPauseClicked() : void
+            + onNextClicked() : void
+            + onPreviousClicked() : void
+            + onVolumeChanged() : void
+            + onShuffleClicked() : void
+            + onRepeatClicked() : void
+
+            'WIP'
+            + onQueueClicked() : void
+        }
+
+        class HomeController {
+            - main : TunixApp
+            + HomeController(main : TunixApp)
+            + draw() : void
+            
+        }
+
+        class LibraryController {
+            - main : TunixApp
+            - library : Library
+            + LibraryController(main : TunixApp, library : Library)
+            + draw() : void
+            - fetchLibraryAssets() : List<ILibraryAsset>
+            + getLibraryAssets() : List<ILibraryAsset>
+            + onAssetClicked(asset : ILibraryAsset) : void
+            + onAssetRightClicked(asset : ILibraryAsset) : void
+        }
+
+        class TopBarController {
+            - main : TunixApp
+            + TopBarController(main : TunixApp)
+            + draw() : void
+            + onHomeClicked() : void
+            + onSearchClicked() : void
+            + onProfileClicked() : void
+        }
+
+        class PlaylistController {
+            - main : TunixApp
+            - playlist : Playlist
+            + PlaylistController(main : TunixApp, playlist : Playlist)
+            + draw() : void
+            + onSongClicked(song : Song) : void
+            + onRemoveSongClicked(song : Song) : void
+            + addSong(song : Song) : void
+        }
+
+        class ProfileController {
+            - main : TunixApp
+            - user : User
+            + ProfileController(main : TunixApp, user : User)
+            + OnSettingsClicked() : void
+            + OnLogoutClicked() : void
+            + draw() : void
+        }
+
+        class LoginController
+        class AdminController
+        class UserProfileController
+        class ArtistController
+        class RightClickMenuController
+        class SearchController
+        class SongController
+        class AlbumController
+
+        MusicPlayerController ..|> IController
+        HomeController ..|> IController
+        LibraryController ..|> IController
+        TopBarController ..|> IController
+        PlaylistController ..|> IController
+        ProfileController ..|> IController
+        RightClickMenuController ..|> IController
     }
-
-    class TunixApp {
-        - {static} current : IController
-
-        + {static} main(args : String[]) : void
-        + {static} initialize() : void
-
-        - {static} drawPersistentElements() : void
-        - {static} drawCenter() : void
-
-        + onPlaylistClicked() : void
-        + onAlbumClicked() : void
-        + onSongClicked() : void
-        + onHomeClicked() : void
-        + onSearchClicked() : void
-        + onProfileClicked() : void
-    }
-
-    class MusicPlayerController {
-        - main : TunixApp
-        - player : MusicPlayer
-        + MusicPlayerController(main : TunixApp, player : MusicPlayer)
-        + draw() : void
-        + onPlayClicked() : void
-        + onPauseClicked() : void
-        + onNextClicked() : void
-        + onPreviousClicked() : void
-        + onVolumeChanged() : void
-        + onShuffleClicked() : void
-        + onRepeatClicked() : void
-
-        'WIP'
-        + onQueueClicked() : void
-    }
-
-    class HomeController {
-        - main : TunixApp
-        + HomeController(main : TunixApp)
-        + draw() : void
-        
-    }
-
-    class LibraryController {
-        - main : TunixApp
-        - library : Library
-        + LibraryController(main : TunixApp, library : Library)
-        + draw() : void
-        - fetchLibraryAssets() : List<ILibraryAsset>
-        + getLibraryAssets() : List<ILibraryAsset>
-        + onAssetClicked(asset : ILibraryAsset) : void
-        + onAssetRightClicked(asset : ILibraryAsset) : void
-    }
-
-    class TopBarController {
-        - main : TunixApp
-        + TopBarController(main : TunixApp)
-        + draw() : void
-        + onHomeClicked() : void
-        + onSearchClicked() : void
-        + onProfileClicked() : void
-    }
-
-    class PlaylistController {
-        - main : TunixApp
-        - playlist : Playlist
-        + PlaylistController(main : TunixApp, playlist : Playlist)
-        + draw() : void
-        + onSongClicked(song : Song) : void
-        + onRemoveSongClicked(song : Song) : void
-        + addSong(song : Song) : void
-    }
-
-    class ProfileController {
-        - main : TunixApp
-        - user : User
-        + ProfileController(main : TunixApp, user : User)
-        + OnSettingsClicked() : void
-        + OnLogoutClicked() : void
-        + draw() : void
-    }
-    }
-    MusicPlayerController ..|> IController
-HomeController ..|> IController
-LibraryController ..|> IController
-TopBarController ..|> IController
-PlaylistController ..|> IController
-ProfileController ..|> IController
-
+    
     ' =====================================================
     ' SERVICE LAYER
     ' =====================================================
