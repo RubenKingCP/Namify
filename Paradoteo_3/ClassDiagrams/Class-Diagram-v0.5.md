@@ -161,8 +161,15 @@ package "Frontend" {
 
         ' Main screens
         class HomeView
-        class SearchView
-        class SongView
+        
+        class SearchView {
+            + onSearchButtonClicked() : void
+        }
+
+        class SongView {
+            + onRightClickSong()
+            + showExtraMenu()
+        }
         class AlbumView
         class PlaylistView{
         + onSongClicked(song : Song) : void
@@ -299,7 +306,12 @@ package "Frontend" {
         class ArtistController
         class RightClickMenuController
         class SearchController
-        class SongController
+        
+        class SongController {
+            + addSongToPlaylist(playlistId : int, songId : int) : void
+            + showSongAlreadyInPlaylist() : void
+        }
+
         class AlbumController
 
         MusicPlayerController ..|> IController
@@ -421,7 +433,7 @@ package "Frontend" {
 
             + deletePlaylist(playlistId : int) : Boolean
 
-            + addSong(playlistId : int, songId : int) : Boolean
+            + addSongToPlaylist(playlistId : int, songId : int) : Boolean
 
             + removeSong(playlistId : int, songId : int) : Boolean
 
@@ -430,6 +442,8 @@ package "Frontend" {
             + removeCoauthor(playlistId : int, userId : int) : Boolean
 
             + renamePlaylist(playlistId : int, name : String) : Boolean
+
+            + checkIfSongInPlaylist(playlistId: int, songId : int) : boolean
         }
 
         class SongService {
@@ -467,7 +481,10 @@ package "Frontend" {
         class ApiClient
 
         class SongAPI
-        class PlaylistAPI
+        class PlaylistAPI {
+          + postAddSongToPlaylist() : boolean
+          + updatePlaylist() : void
+        }
         class AlbumAPI
         class LibraryAPI
         class UserAPI
@@ -680,7 +697,9 @@ package "Controller Layer (REST)" as C{
     class AdminControllerAPI
     class SongControllerAPI
     class AlbumControllerAPI
-    class PlaylistControllerAPI
+    class PlaylistControllerAPI {
+        + addSong(playlistId : int, songId : int) : boolean
+    }
     class LibraryControllerAPI
     class ListeningHistoryControllerAPI
     class ArtistRequestControllerAPI
@@ -711,7 +730,9 @@ package "Service Layer" as S{
     class AdminService
     class SongService
     class AlbumService
-    class PlaylistService
+    class PlaylistService {
+        addSong(playlistId : int, songId : int) : boolean
+    }
     class LibraryService
     class ListeningHistoryService
     class ArtistRequestService
@@ -742,7 +763,9 @@ package "Repository Layer (JPA)" {
     class AdminRepository
     class SongRepository
     class AlbumRepository
-    class PlaylistRepository
+    class PlaylistRepository {
+       + addSongQuery() : boolean
+    }
     class LibraryRepository
     class ListeningHistoryRepository
     class ArtistRequestRepository
