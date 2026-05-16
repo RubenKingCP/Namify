@@ -11,7 +11,6 @@ boundary "Ερωτηματολόγιο" as que
 database "Βάση Δεδομένων" as db
 control "Αποθήκευσε Αίτηση" as saveApplication
 usecase "Έγκριση/Απόρριψη Λογαριασμού Καλλιτέχνη" as appOrRej
-
 user -> mainScreen : Προφίλ
 disPrSett -> PrSett
 user -> PrSett : "Apply for artist"
