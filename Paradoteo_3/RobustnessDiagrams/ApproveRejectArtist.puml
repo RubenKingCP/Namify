@@ -16,7 +16,7 @@ control "Εμφάνισε λεπτομέρειες αίτησης" as Details
 control "Πάρε απάντηση" as Response
 control "Ενημέρωσε βάση" as UpdateDB
 
-entity "Βάση Δεδομένων" as DB
+database "Βάση Δεδομένων" as DB
 
 Admin --> Menu
 Menu --> FetchApps
