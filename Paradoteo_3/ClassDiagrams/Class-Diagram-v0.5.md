@@ -721,101 +721,101 @@ package "Controller Layer (REST)" as C{
 ' SERVICE LAYER
 ' =====================================================
 
-package "Service Layer" as S{
+package "BackendService Layer" as S{
 
-    interface Service
+    interface BackendService
 
-    class UserService
-    class ArtistService
-    class AdminService
-    class SongService
-    class AlbumService
-    class PlaylistService {
+    class UserBackendService
+    class ArtistBackendService
+    class AdminBackendService
+    class SongBackendService
+    class AlbumBackendService
+    class PlaylistBackendService {
         addSong(playlistId : int, songId : int) : boolean
     }
-    class LibraryService
-    class ListeningHistoryService
-    class ArtistRequestService
+    class LibraryBackendService
+    class ListeningHistoryBackendService
+    class ArtistRequestBackendService
 
-    Service <|.. UserService
-    Service <|.. ArtistService
-    Service <|.. AdminService
-    Service <|.. SongService
-    Service <|.. AlbumService
-    Service <|.. PlaylistService
-    Service <|.. LibraryService
-    Service <|.. ListeningHistoryService
-    Service <|.. ArtistRequestService
+    BackendService <|.. UserBackendService
+    BackendService <|.. ArtistBackendService
+    BackendService <|.. AdminBackendService
+    BackendService <|.. SongBackendService
+    BackendService <|.. AlbumBackendService
+    BackendService <|.. PlaylistBackendService
+    BackendService <|.. LibraryBackendService
+    BackendService <|.. ListeningHistoryBackendService
+    BackendService <|.. ArtistRequestBackendService
 }
 
 
 
 ' =====================================================
-' REPOSITORY LAYER
+' BackendRepository LAYER
 ' =====================================================
 
-package "Repository Layer (JPA)" {
+package "BackendRepository Layer (JPA)" {
 
-    interface JpaRepository
+    interface JpaBackendRepository
 
-    class UserRepository
-    class ArtistRepository
-    class AdminRepository
-    class SongRepository
-    class AlbumRepository
-    class PlaylistRepository {
+    class UserBackendRepository
+    class ArtistBackendRepository
+    class AdminBackendRepository
+    class SongBackendRepository
+    class AlbumBackendRepository
+    class PlaylistBackendRepository {
        + addSongQuery() : boolean
     }
-    class LibraryRepository
-    class ListeningHistoryRepository
-    class ArtistRequestRepository
+    class LibraryBackendRepository
+    class ListeningHistoryBackendRepository
+    class ArtistRequestBackendRepository
 
-    JpaRepository <|.. UserRepository
-    JpaRepository <|.. ArtistRepository
-    JpaRepository <|.. AdminRepository
-    JpaRepository <|.. SongRepository
-    JpaRepository <|.. AlbumRepository
-    JpaRepository <|.. PlaylistRepository
-    JpaRepository <|.. LibraryRepository
-    JpaRepository <|.. ListeningHistoryRepository
-    JpaRepository <|.. ArtistRequestRepository
+    JpaBackendRepository <|.. UserBackendRepository
+    JpaBackendRepository <|.. ArtistBackendRepository
+    JpaBackendRepository <|.. AdminBackendRepository
+    JpaBackendRepository <|.. SongBackendRepository
+    JpaBackendRepository <|.. AlbumBackendRepository
+    JpaBackendRepository <|.. PlaylistBackendRepository
+    JpaBackendRepository <|.. LibraryBackendRepository
+    JpaBackendRepository <|.. ListeningHistoryBackendRepository
+    JpaBackendRepository <|.. ArtistRequestBackendRepository
 
 }
 
 
 
 ' =====================================================
-' FLOW: CONTROLLER → SERVICE
+' FLOW: CONTROLLER → BackendService
 ' =====================================================
 
-SongBackendController -- S.SongService
-PlaylistBackendController -- S.PlaylistService
-AlbumBackendController -- S.AlbumService
-UserBackendController -- S.UserService
-ArtistBackendController -- S.ArtistService
-LibraryBackendController -- S.LibraryService
+SongBackendController -- S.SongBackendService
+PlaylistBackendController -- S.PlaylistBackendService
+AlbumBackendController -- S.AlbumBackendService
+UserBackendController -- S.UserBackendService
+ArtistBackendController -- S.ArtistBackendService
+LibraryBackendController -- S.LibraryBackendService
 
 ' =====================================================
-' FLOW: SERVICE → REPOSITORY
+' FLOW: BackendService → BackendRepository
 ' =====================================================
 
-S.SongService -- SongRepository
-S.PlaylistService -- PlaylistRepository
-S.AlbumService -- AlbumRepository
-S.UserService -- UserRepository
-S.ArtistService -- ArtistRepository
-S.LibraryService -- LibraryRepository
+S.SongBackendService -- SongBackendRepository
+S.PlaylistBackendService -- PlaylistBackendRepository
+S.AlbumBackendService -- AlbumBackendRepository
+S.UserBackendService -- UserBackendRepository
+S.ArtistBackendService -- ArtistBackendRepository
+S.LibraryBackendService -- LibraryRepository
 
 ' =====================================================
-' SERVICE → DOMAIN
+' BackendService → DOMAIN
 ' =====================================================
 
-S.SongService .. E.Song
-S.PlaylistService .. E.Playlist
-S.AlbumService .. E.Album
-S.UserService .. E.User
-S.LibraryService .. E.Library
-S.ArtistService .. E.Artist
+S.SongBackendService .. E.Song
+S.PlaylistBackendService .. E.Playlist
+S.AlbumBackendService .. E.Album
+S.UserBackendService .. E.User
+S.LibraryBackendService .. E.Library
+S.ArtistBackendService .. E.Artist
 
 ' =====================================================
 ' CONTROLLER → DTO
