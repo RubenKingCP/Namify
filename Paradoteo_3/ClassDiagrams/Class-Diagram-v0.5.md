@@ -692,27 +692,27 @@ package "Controller Layer (REST)" as C{
 
     interface API
 
-    class UserControllerAPI
-    class ArtistControllerAPI
-    class AdminControllerAPI
-    class SongControllerAPI
-    class AlbumControllerAPI
-    class PlaylistControllerAPI {
+    class UserBackendController
+    class ArtistBackendController
+    class AdminBackendController
+    class SongBackendController
+    class AlbumBackendController
+    class PlaylistBackendController {
         + addSong(playlistId : int, songId : int) : boolean
     }
-    class LibraryControllerAPI
-    class ListeningHistoryControllerAPI
-    class ArtistRequestControllerAPI
+    class LibraryBackendController
+    class ListeningHistoryBackendController
+    class ArtistRequestBackendController
 
-    API <|.. UserControllerAPI
-    API <|.. ArtistControllerAPI
-    API <|.. AdminControllerAPI
-    API <|.. SongControllerAPI
-    API <|.. AlbumControllerAPI
-    API <|.. PlaylistControllerAPI
-    API <|.. LibraryControllerAPI
-    API <|.. ListeningHistoryControllerAPI
-    API <|.. ArtistRequestControllerAPI
+    API <|.. UserBackendController
+    API <|.. ArtistBackendController
+    API <|.. AdminBackendController
+    API <|.. SongBackendController
+    API <|.. AlbumBackendController
+    API <|.. PlaylistBackendController
+    API <|.. LibraryBackendController
+    API <|.. ListeningHistoryBackendController
+    API <|.. ArtistRequestBackendController
 }
 
 
@@ -788,12 +788,12 @@ package "Repository Layer (JPA)" {
 ' FLOW: CONTROLLER → SERVICE
 ' =====================================================
 
-SongControllerAPI -- S.SongService
-PlaylistControllerAPI -- S.PlaylistService
-AlbumControllerAPI -- S.AlbumService
-UserControllerAPI -- S.UserService
-ArtistControllerAPI -- S.ArtistService
-LibraryControllerAPI -- S.LibraryService
+SongBackendController -- S.SongService
+PlaylistBackendController -- S.PlaylistService
+AlbumBackendController -- S.AlbumService
+UserBackendController -- S.UserService
+ArtistBackendController -- S.ArtistService
+LibraryBackendController -- S.LibraryService
 
 ' =====================================================
 ' FLOW: SERVICE → REPOSITORY
@@ -821,23 +821,23 @@ S.ArtistService .. E.Artist
 ' CONTROLLER → DTO
 ' =====================================================
 
-SongControllerAPI -- SongDTO
-PlaylistControllerAPI -- PlaylistDTO
-AlbumControllerAPI -- AlbumDTO
-UserControllerAPI -- UserDTO
-ArtistControllerAPI -- ArtistDTO
-LibraryControllerAPI -- LibraryDTO
+SongBackendController -- SongDTO
+PlaylistBackendController -- PlaylistDTO
+AlbumBackendController -- AlbumDTO
+UserBackendController -- UserDTO
+ArtistBackendController -- ArtistDTO
+LibraryBackendController -- LibraryDTO
 
 ' =====================================================
 ' CONTROLLER → API layer
 ' =====================================================
-AlbumAPI -- AlbumControllerAPI
-SongAPI -- SongControllerAPI
-PlaylistAPI -- PlaylistControllerAPI
-LibraryAPI -- LibraryControllerAPI
-UserAPI -- UserControllerAPI
-ArtistRequestAPI -- ArtistRequestControllerAPI
-ArtistAPI -- ArtistControllerAPI
-AdminAPI -- AdminControllerAPI
+AlbumAPI -- AlbumBackendController
+SongAPI -- SongBackendController
+PlaylistAPI -- PlaylistBackendController
+LibraryAPI -- LibraryBackendController
+UserAPI -- UserBackendController
+ArtistRequestAPI -- ArtistRequestBackendController
+ArtistAPI -- ArtistBackendController
+AdminAPI -- AdminBackendController
 }
 @enduml
