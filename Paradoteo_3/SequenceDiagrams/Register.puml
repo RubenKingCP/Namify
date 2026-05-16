@@ -9,6 +9,7 @@ participant RegisterBackendController as Foo5
 participant RegisterBackendService as Foo6
 participant RegisterBackendRepository as Foo7
 database Database as Foo8
+participant EventBus
 
 Foo -> Foo1 : Press Register Button
 
@@ -22,7 +23,7 @@ activate Foo3
 Foo3 -> Foo4 : checkForDuplicateNameOrEmail(username)
 
 activate Foo4
-Foo4 -> Foo5 : Get /user/nameOrEmail
+Foo4 -> Foo5 : GET /user/nameOrEmail
 
 activate Foo5
 Foo5 -> Foo6 : findUserByNameOrEmail(username)
@@ -31,42 +32,40 @@ activate Foo6
 Foo6 -> Foo7 : findUserByNameOrEmail(username)
 
 activate Foo7
-Foo7 -> Foo8 : Select User By Name or Email Query
+Foo7 -> Foo8 : SELECT user
 
-Foo8 -> Foo7 : return success / error
+Foo8 --> Foo7 : result
 
-alt User found 
-    Foo7 -> Foo6 : return success / error
+alt User found
+    Foo7 --> Foo6 : exists
+    Foo6 --> Foo5 : exists
+    Foo5 --> Foo4 : exists
+    Foo4 --> Foo3 : duplicate found
+
+    Foo3 -> Foo2 : ShowDuplicateEmailOrUsername()
+    Foo2 -> Foo1 : ShowDuplicateError()
+
 else User not found
-    Foo7 -> Foo8 : Insert User Statement
-    Foo8 -> Foo7 : return UserInsertSuccess
-    return UserInsertSuccess
+    Foo7 --> Foo6 : not found
+    Foo6 -> Foo7 : INSERT user
+    Foo7 --> Foo6 : insert success
+
+    Foo6 --> Foo5 : success
+    Foo5 --> Foo4 : success
+    Foo4 --> Foo3 : success
+
+    Foo3 -> Foo2 : RegisterSuccessful()
+    Foo2 -> Foo1 : RegisterSuccessful()
+
+    Foo3 -> EventBus : changeToLoginView()
 end
 
 deactivate Foo7
-
-Foo6 -> Foo5 : return success / error
 deactivate Foo6
-
-Foo5 -> Foo4 : return success / error
 deactivate Foo5
-
-Foo4 -> Foo3 : return success / error
 deactivate Foo4
-
-alt User found
-    Foo3 -> Foo2 : ShowDuplicateEmailOrUsername()
-    deactivate Foo3
-
-    Foo2 -> Foo1 : ShowDuplcateError()
-    deactivate Foo2
-else User not found
-    Foo3 -> Foo2 : RegisterSuccessful()
-    Foo2 -> Foo1 : RegisterSuccessful()
-    Foo3 -> EventBus : changeToLoginView()
-    deactivate Foo2
-    deactivate Foo1
-end
+deactivate Foo3
 deactivate Foo2
 deactivate Foo1
+
 @enduml
