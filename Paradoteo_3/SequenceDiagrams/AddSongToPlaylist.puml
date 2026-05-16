@@ -37,6 +37,7 @@ alt "User selected a playlist"
         activate PlaylistRepository
         PlaylistRepository -> Database : Execute SQL to add song to playlist
         Database --> PlaylistRepository : Success/Failure
+        PlaylistRepository --> PlaylistBackendService : Success/Failure
         deactivate PlaylistRepository
         PlaylistBackendService --> PlaylistBackendController : Success/Failure
         deactivate PlaylistBackendService
@@ -73,6 +74,7 @@ else "User Selected Favourites"
     activate PlaylistRepository
     PlaylistRepository -> Database : Execute SQL to add song to favourites
     Database --> PlaylistRepository : Success/Failure
+    PlaylistRepository --> PlaylistBackendService : Success/Failure
     deactivate PlaylistRepository
     PlaylistBackendService --> PlaylistBackendController : Success/Failure
     deactivate PlaylistBackendService
