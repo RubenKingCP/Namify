@@ -1,0 +1,65 @@
+@startuml name
+
+title Ανέβασμα Τραγουδιού
+
+actor AppArtist
+participant HomeView
+participant HomeController
+participant Song
+participant Artist
+participant SongControllerAPI
+participant SongService
+participant SongRepository
+participant ArtistControllerAPI
+participant ArtistService
+participant ArtistRepository
+
+activate HomeController
+HomeController -> HomeView : display()
+activate HomeView
+AppArtist -> HomeView : uploadSong()
+HomeView -> HomeView : showUploadSongScreen()
+AppArtist -> HomeView : song details
+HomeView -> HomeController : checkForDuplicate()
+HomeController -> Artist : checkForDuplicate()
+activate Artist
+Artist -> ArtistControllerAPI : checkDuplicateSong()
+activate ArtistControllerAPI
+ArtistControllerAPI -> ArtistService : checkForDuplicateSong
+activate ArtistService
+ArtistService -> ArtistRepository : SELECT * from song where song_name = songName
+activate ArtistRepository
+ArtistRepository --> ArtistService : row Songs
+deactivate ArtistRepository
+ArtistService --> ArtistControllerAPI : return HasDuplicate
+deactivate ArtistService
+ArtistControllerAPI --> Artist : return HasDuplicate
+deactivate ArtistControllerAPI
+Artist --> HomeController : return HasDuplicate
+deactivate Artist
+alt not HasDuplicate
+    HomeController -> HomeView : approve()
+    Artist -> HomeView : uploadSong()
+    HomeView -> HomeController : uploadSong()
+    HomeController -> Song : uploadSong()
+    activate Song
+    Song -> SongControllerAPI : postSong()
+    activate SongControllerAPI
+    SongControllerAPI -> SongService : inseertSongToDatabase()
+    activate SongService
+    SongService -> SongRepository : INSERT INTO song (songId, file_location)
+    activate SongRepository
+    SongRepository --> SongService : return upload status
+    deactivate SongRepository
+    SongService --> SongControllerAPI : return upload status
+    deactivate SongService
+    SongControllerAPI --> Song : return upload status
+    deactivate SongControllerAPI
+    Song --> HomeController : return upload status
+    deactivate Song
+    HomeController -> HomeView : showUploadStatus()
+else HasDuplicate
+    HomeController -> HomeView : showDuplicateFoundError()
+end
+
+@enduml

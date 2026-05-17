@@ -1,0 +1,77 @@
+@startuml name
+
+title Εγκριση/Απορριψη  Λογαριασμου Καλλιτεχνη 
+
+actor AppAdmin
+participant HomeView
+participant HomeController
+participant Admin
+participant ArtistRequestControllerAPI
+participant ArtistRequestService
+participant ArtistRequestRepository
+
+activate HomeController
+HomeController -> HomeView
+activate HomeView
+AppAdmin -> HomeView : showArtistApplications()
+HomeView -> HomeController : getArtistApplications()
+HomeController -> Admin : getArtistApplications()
+activate Admin
+Admin -> ArtistRequestControllerAPI : fetchArtistApplications()
+activate ArtistRequestControllerAPI
+ArtistRequestControllerAPI -> ArtistRequestService : findAllApplication()
+activate ArtistRequestService
+ArtistRequestService -> ArtistRequestRepository : select * from artist_application 
+activate ArtistRequestRepository
+ArtistRequestRepository --> ArtistRequestService : row Applications
+deactivate ArtistRequestRepository
+ArtistRequestService --> ArtistRequestControllerAPI : List<Applications>
+deactivate ArtistRequestService
+ArtistRequestControllerAPI --> Admin : List<Applications>
+deactivate ArtistRequestControllerAPI
+Admin --> HomeController : List<Applications>
+deactivate Admin
+HomeController -> HomeView : showRequests()
+AppAdmin -> HomeView : selectRequest()
+HomeView -> HomeView : showSelectedRequest()
+alt Reject
+    AppAdmin -> HomeView : rejectRequest()
+    HomeView -> HomeController : saveResponse()
+    HomeController -> Admin : saveResponse()
+    activate Admin
+    Admin -> ArtistRequestControllerAPI : postRejectResponse()
+    activate ArtistRequestControllerAPI
+    ArtistRequestControllerAPI -> ArtistRequestService : RejectResponse()
+    activate ArtistRequestService
+    ArtistRequestService -> ArtistRequestRepository : ALTER TABLE artist_application MODIFY COLUMN STATUS REJECT where artist_application.id = aplicatonId;
+    activate ArtistRequestRepository
+    ArtistRequestRepository --> ArtistRequestService : row Status
+    deactivate ArtistRequestRepository
+    ArtistRequestService --> ArtistRequestControllerAPI : Status
+    deactivate ArtistRequestService
+    ArtistRequestControllerAPI --> Admin : Status
+    deactivate ArtistRequestControllerAPI
+    Admin --> HomeController : Status
+    deactivate Admin
+else Approve
+    AppAdmin -> HomeView : approveRequest()
+    HomeView -> HomeController : saveResponse()
+    HomeController -> Admin : saveResponse()
+    activate Admin
+    Admin -> ArtistRequestControllerAPI : postApproveResponse()
+    activate ArtistRequestControllerAPI
+    ArtistRequestControllerAPI -> ArtistRequestService : ApproveResponse()
+    activate ArtistRequestService
+    ArtistRequestService -> ArtistRequestRepository : ALTER TABLE artist_application MODIFY COLUMN STATUS APPROVE where artist_application.id = aplicatonId;
+    activate ArtistRequestRepository
+    ArtistRequestRepository --> ArtistRequestService : row Status
+    deactivate ArtistRequestRepository
+    ArtistRequestService --> ArtistRequestControllerAPI : Status
+    deactivate ArtistRequestService
+    ArtistRequestControllerAPI --> Admin : Status
+    deactivate ArtistRequestControllerAPI
+    Admin --> HomeController : Status
+    deactivate Admin
+end
+
+@enduml

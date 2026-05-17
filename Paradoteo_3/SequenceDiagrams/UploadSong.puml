@@ -1,0 +1,68 @@
+@startuml Upload Song
+actor Artist as artist 
+participant ArtistProfileView as profileView
+participant ArtistProfileController as profileController
+participant SongUploadView as uploadView
+participant SongUploadController as uploadController
+participant SongService as songService
+participant SongApi as songApi
+participant SongBackendController as songBackendController
+participant SongBackendService as songBackendService
+participant SongBackendRepository as songBackendRepository
+database Database as database
+participant EventBus as eventBus
+
+artist -> profileView: Click "Upload Song"
+activate profileView
+
+profileView -> profileController: showUploadSongForm()
+activate profileController
+
+profileController -> EventBus: publish(ShowUploadSongFormEvent)
+deactivate profileController
+deactivate profileView
+
+EventBus -> uploadView: onShowUploadSongFormEvent()
+activate uploadView
+artist -> uploadView: Fill in song details
+artist -> uploadView: Select song file
+uploadView -> uploadController: findMusicFileInSystem()
+activate uploadController
+uploadController -> songService: findMusicFileInSystem()
+songService -> uploadController: return filePath
+deactivate songService
+uploadController -> uploadView: displaySelectedFile(filePath)
+deactivate uploadController
+artist -> uploadView: Click "Submit"
+uploadView -> uploadController: submitSongUpload(songDetails, songFile)
+activate uploadController
+
+uploadController -> songService: validateSongDetails(songDetails)
+songService -> uploadController: return validationResult
+deactivate songService
+alt validationResult is valid
+    uploadController -> songService: uploadSong(songDetails, songFile)
+    songService -> songApi: uploadSongToServer(songDetails, songFile)
+    songApi -> songBackendController: handleSongUploadRequest(songDetails, songFile)
+    activate songBackendController
+    songBackendController -> songBackendService: processSongUpload(songDetails, songFile)
+    activate songBackendService
+    songBackendService -> songBackendRepository: saveSong(songDetails, songFile)
+    songBackendRepository -> database: insert(songRecord)
+    database -> songBackendRepository: return success
+    songBackendRepository -> songBackendService: return success
+    deactivate songBackendRepository
+    songBackendService -> songBackendController: return success
+    deactivate songBackendService
+    songBackendController -> songApi: return success
+    deactivate songBackendController
+    songApi -> songService: return success
+    songService -> uploadController: return success
+    uploadController -> uploadView: displaySuccessMessage()
+else
+    uploadController -> uploadView: displayValidationErrors(validationResult)
+end
+deactivate uploadController
+deactivate uploadView
+
+@enduml

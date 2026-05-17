@@ -1,0 +1,43 @@
+@startuml name 
+
+title Ακολούθηση καλλιτέχνη
+
+'Υποθετουμε οτι εχουμε είδη βρει τον καλλιτέχνη που θέλουμε να ακολουθήσουμε
+
+actor User as u 
+participant TopBarView
+participant TopBarController
+participant ProfileController
+participant MainController
+participant User
+participant AccountControllerAPI
+participant AccountService
+participant AccountRepository
+
+u -> TopBarView : followArtist(artistId)
+TopBarView -> TopBarController : followArtist(artistId)
+TopBarController -> ProfileController : followArtist(artistId)
+activate ProfileController
+ProfileController -> MainController : followArtist(artistId)
+deactivate ProfileController
+activate MainController
+MainController -> User: followArtist(artistId)
+deactivate MainController
+activate User
+User-> AccountControllerAPI : followArtist(artistId)
+deactivate User
+activate AccountControllerAPI
+AccountControllerAPI -> AccountService : followArtist(artistId)
+deactivate AccountControllerAPI
+activate AccountService
+AccountService -> AccountRepository : followArtist(artistId)
+deactivate AccountService
+activate AccountRepository
+AccountRepository -> AccountRepository : exists()
+alt Already Following
+    AccountRepository --> u : Already exists
+else
+    AccountRepository -> AccountRepository : addFollowingArtist()
+    AccountRepository --> u : Task successful
+end 
+@enduml
