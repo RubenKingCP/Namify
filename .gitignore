@@ -1,3 +1,4 @@
 Code/Tunix/app/bin/
 
 /Code/Tunix/app/bin
+*.class
