@@ -1,4 +1,4 @@
-@startuml
+@startuml name
 actor User as user 
 participant SongView as songView
 participant SongController as songController
