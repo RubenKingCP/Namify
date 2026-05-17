@@ -30,7 +30,6 @@ control Check_Premium_State
 control Premium_Expiration_Screen_Options
 control Cancel_Automatic_Subscription
 control Change_Premium_Plan
-control Διαδικασία_Πληρωμής
 control Check_Premium_Plan_Expire_Date
 control Revert_To_Free
 control Init_Fetch_Info
@@ -42,6 +41,13 @@ control Premium_Fetch_Info
 
 entity Βάση_Δεδομένων
 entity Τοπικό_Σύστημα_Αρχείων
+
+' =====================================================
+' USE CASES
+' =====================================================
+
+usecase Payment_Through_Bank_Account
+usecase Premium_Purchase
 
 ' =====================================================
 ' INTERACTIONS
@@ -59,7 +65,7 @@ Premium_Expiration_Screen_Options --> Cancel_Automatic_Subscription
 Cancel_Automatic_Subscription --> Βάση_Δεδομένων : Set Premium_Plan_Auto_Renew = 0
 
 Premium_Expiration_Screen_Options --> Change_Premium_Plan 
-Change_Premium_Plan --> Διαδικασία_Πληρωμής : Δες PremiumPurchase
+Change_Premium_Plan --> Premium_Purchase
 
 Γενικός_Χρήστης --> Εικόνα_Εφαρμογής 
 Εικόνα_Εφαρμογής --> Init_Fetch_Info : Εκκίνηση της εφαρμογής
@@ -69,7 +75,7 @@ Init_Fetch_Info --> Check_Premium_Plan_Expire_Date
 Check_Premium_Plan_Expire_Date --> Premium_Expiration : If Premium_Plan_Type =/= 0 && Premium_Plan_Expire_Date >= Σημερινή Μέρα
 Premium_Expiration <--> Βάση_Δεδομένων : Fetch Premium_Plan_Auto_Renew
 Premium_Expiration --> Revert_To_Free : If Premium_Plan_Auto_Renew == 0
-Premium_Expiration --> Διαδικασία_Πληρωμής : If Premium_Plan_Auto_Renew =/= 0
+Premium_Expiration --> Payment_Through_Bank_Account : If Premium_Plan_Auto_Renew =/= 0
 Revert_To_Free --> Βάση_Δεδομένων : Set Premium_Plan_Type = 0
 
 
