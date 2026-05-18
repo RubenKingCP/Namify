@@ -23,6 +23,12 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // Add Apache HttpClient for making HTTP requests to the backend API.
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
+
+    // Add Jackson for JSON serialization/deserialization.
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

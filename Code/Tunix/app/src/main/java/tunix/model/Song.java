@@ -6,13 +6,15 @@ public class Song implements ILibraryAsset {
     private final Artist artist;
     private final int duration; // Duration in seconds
     private final String filePathUrl;
+    private final String coverImageUrl; // Optional cover image URL
 
-    public Song(String title, int songId, Artist artist, int duration, String filePathUrl) {
+    public Song(String title, int songId, Artist artist, int duration, String filePathUrl, String coverImageUrl) {
         this.title = title;
         this.songId = songId;
         this.artist = artist;
         this.duration = duration;
         this.filePathUrl = filePathUrl;
+        this.coverImageUrl = coverImageUrl;
     }
 
     @Override
@@ -35,5 +37,9 @@ public class Song implements ILibraryAsset {
 
     public String getFilePathUrl() {
         return filePathUrl;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
     }
 }

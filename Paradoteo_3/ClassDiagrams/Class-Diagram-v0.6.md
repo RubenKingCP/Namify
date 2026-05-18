@@ -14,6 +14,7 @@ left to right direction
 ' =====================================================
 
 package "Frontend" {
+    left to right direction
 
     ' =====================================================
     ' MODEL LAYER
@@ -186,7 +187,7 @@ package "Frontend" {
     }
 
     class ListeningHistoryItem {
-        - song : song
+        - song : Song
         - playedAt : LocalDateTime
         --
         + getSong() : Song
@@ -243,18 +244,42 @@ package "Frontend" {
         }
         class AlbumView
         class PlaylistView{
-        + onSongClicked(song : Song) : void
-        + onRemoveSongClicked(song : Song) : void
-        + addSong(song : Song) : void
-    }
+            + onSongClicked(song : Song) : void
+            + onRemoveSongClicked(song : Song) : void
+            + addSong(song : Song) : void
+        }
         class ArtistView
         class LoginView
+
         class UserProfileView{
-        + OnSettingsClicked() : void
-        + OnLogoutClicked() : void
-    }
+            + OnSettingsClicked() : void
+            + OnLogoutClicked() : void
+        }
+
         class AdminView
-        class RightClickMenuView
+
+        class ArtistProfileView {
+            - artistProfileController : ArtistProfileController
+            --
+            + setArtistProfileController(controller : ArtistProfileController) : void
+            + onUploadSongClicked() : void
+            + display() : void
+        }
+
+        class UploadSongView {
+            - uploadController : UploadController
+            --
+            + setUploadController(controller : UploadController) : void
+            + display() : void
+            + onSelectFileClicked() : void
+            + onSubmitButtonClicked() : void
+            + displaySelectedSongFilepath(filePath : String) : void
+            + displaySelectedImageCover(imageFilePath : String) : void
+            + displayError(message : String) : void
+            + displaySuccess(message : String) : void
+        }
+
+
         ' Library sub views
         class LibrarySongView
         class LibraryAlbumView
@@ -371,6 +396,14 @@ package "Frontend" {
             + draw() : void
         }
 
+        class ArtistProfileController {
+            - main : TunixApp
+            - artist : Artist
+            + ArtistProfileController(main : TunixApp, artist : Artist)
+            + onUploadSongClicked() : void
+            + draw() : void
+        }
+
         class LoginController
         class AdminController
         class UserProfileController
@@ -381,6 +414,21 @@ package "Frontend" {
         class SongController {
             + addSongToPlaylist(playlistId : int, songId : int) : void
             + showSongAlreadyInPlaylist() : void
+        }
+
+        class UploadSongController {
+            - uploadSongView : UploadSongView
+            - songService : SongService
+            - eventBus : EventBus
+            + UploadSongController(uploadSongView : UploadSongView, songService : SongService, eventBus : EventBus)
+            + onSelectFileClicked() : void
+            + onSubmitButtonClicked() : void
+            + draw() : void
+            + displaySelectedFile(filepath : String) : void
+            + displaySelectedImageCover(imageFilePath : String) : void
+            + displayError(message : String) : void
+            + displaySuccess(message : String) : void
+            + songUploadSuccess() : void
         }
 
         class AlbumController
@@ -523,7 +571,7 @@ package "Frontend" {
 
             + getSongsByPlaylist(plId : int) : List<Song>
 
-            + createSong(song : Song) : Song
+            + uploadSong(song : Song) : Song
 
             + deleteSong(songId : int) : Boolean
 
@@ -544,25 +592,39 @@ package "Frontend" {
     }
 
     ' =====================================================
-    ' API LAYER
+    ' Api LAYER
     ' =====================================================
 
-    package "API Layer" {
+    package "Api Layer" {
 
-        class ApiClient
+        class ApiClient {
+            - httpClient : HttpClient
+            - baseUrl : String
+            - objectMapper : ObjectMapper
+            --
+            + get(url : String) : ApiResponse
+            + post(url : String, body : Object) : ApiResponse
+            + put(url : String, body : Object) : ApiResponse
+            + delete(url : String) : ApiResponse
+        }
 
-        class SongAPI
-        class PlaylistAPI {
+        class SongClientApi {
+            - ApiClient : ApiClient
+            --
+            + uploadSong(song : Song) : ApiResponse<Song>
+        }
+
+        class PlaylistApi {
           + postAddSongToPlaylist() : boolean
           + updatePlaylist() : void
         }
-        class AlbumAPI
-        class LibraryAPI
-        class UserAPI
-        class AdminAPI
-        class LoginAPI
-        class ArtistAPI
-        class ArtistRequestAPI
+        class AlbumApi
+        class LibraryApi
+        class UserApi
+        class AdminApi
+        class LoginApi
+        class ArtistApi
+        class ArtistRequestApi
     }
 
     ' =====================================================
@@ -616,73 +678,80 @@ package "Frontend" {
     MusicPlayerView -- MusicPlayerController
     UserProfileView -- UserProfileController
     AdminView -- AdminController
+    UploadSongView -- UploadSongController
+    ArtistProfileView -- ArtistProfileController
 
 
     ' =====================================================
     ' CONTROLLER → SERVICE
     ' =====================================================
+        SearchController -- SearchService
+        LoginController -- LoginService
+        LibraryController -- LibraryService
+        MusicPlayerController -- PlaybackService
+        UserProfileController -- UserService
+        AdminController -- AdminService
+        UserProfileController -- ArtistRequestService
 
-    HomeController -- EventBus
-    SearchController -- SearchService
-    LoginController -- LoginService
-    LibraryController -- LibraryService
-    MusicPlayerController -- PlaybackService
-    UserProfileController -- UserService
-    AdminController -- AdminService
-    UserProfileController -- ArtistRequestService
+        ArtistController -- FollowService
+        ArtistController -- ArtistService
 
-    ArtistController -- FollowService
-    ArtistController -- ArtistService
+        PlaylistController -- PlaylistService
+        LibraryController -- PlaylistService
 
-    PlaylistController -- PlaylistService
-    LibraryController -- PlaylistService
+        SongController -- SongService
 
-    SongController -- SongService
+        UploadSongController -- SongService
 
-    ' =====================================================
-    ' SERVICE → API
-    ' =====================================================
-
-    LibraryService -- LibraryAPI
-    LibraryService -- UserAPI
-
-    SearchService -- SongAPI
-    SearchService -- AlbumAPI
-    SearchService -- PlaylistAPI
-
-    PlaybackService -- SongAPI
-    PlaybackService -- PlaylistAPI
-
-    LoginService -- UserAPI
-    UserService -- UserAPI
-
-    AdminService -- AdminAPI
-
-    PlaylistAPI -- PlaylistService
-
-    FollowService -- UserAPI
-
-    LoginService -- LoginAPI
-
-    ArtistService -- ArtistAPI
-
-    ArtistRequestService -- ArtistRequestAPI
-
-    SongService -- SongAPI
 
     ' =====================================================
-    ' API → CLIENT
+    ' CONTROLLER → EVENTBUS
+    ' =====================================================
+        HomeController -- EventBus
+    ' =====================================================
+    ' SERVICE → Api
     ' =====================================================
 
-    SongAPI -- ApiClient
-    PlaylistAPI -- ApiClient
-    AlbumAPI -- ApiClient
-    LibraryAPI -- ApiClient
-    UserAPI -- ApiClient
-    ArtistAPI -- ApiClient
-    LoginAPI -- ApiClient
-    ArtistRequestAPI -- ApiClient
-    AdminAPI -- ApiClient
+        LibraryService -- LibraryApi
+        LibraryService -- UserApi
+
+        SearchService -- SongClientApi
+        SearchService -- AlbumApi
+        SearchService -- PlaylistApi
+
+        PlaybackService -- SongApi
+        PlaybackService -- PlaylistApi
+
+        LoginService -- UserApi
+        UserService -- UserApi
+
+        AdminService -- AdminApi
+
+        PlaylistApi -- PlaylistService
+
+        FollowService -- UserApi
+
+        LoginService -- LoginApi
+
+        ArtistService -- ArtistApi
+
+        ArtistRequestService -- ArtistRequestApi
+
+        SongService -- SongClientApi
+
+    ' =====================================================
+    ' Api → CLIENT
+    ' =====================================================
+
+    SongApi -- ApiClient
+    PlaylistApi -- ApiClient
+    AlbumApi -- ApiClient
+    LibraryApi -- ApiClient
+    UserApi -- ApiClient
+    ArtistApi -- ApiClient
+    LoginApi -- ApiClient
+    ArtistRequestApi -- ApiClient
+    AdminApi -- ApiClient
 
 
     ' =====================================================
@@ -756,12 +825,12 @@ package "DTO Layer" {
 }
 
 ' =====================================================
-' CONTROLLER LAYER (REST API)
+' CONTROLLER LAYER (REST Api)
 ' =====================================================
 
 package "Controller Layer (REST)" as C{
 
-    interface API
+    interface Api
 
     class UserBackendController
     class ArtistBackendController
@@ -775,15 +844,15 @@ package "Controller Layer (REST)" as C{
     class ListeningHistoryBackendController
     class ArtistRequestBackendController
 
-    API <|.. UserBackendController
-    API <|.. ArtistBackendController
-    API <|.. AdminBackendController
-    API <|.. SongBackendController
-    API <|.. AlbumBackendController
-    API <|.. PlaylistBackendController
-    API <|.. LibraryBackendController
-    API <|.. ListeningHistoryBackendController
-    API <|.. ArtistRequestBackendController
+    Api <|.. UserBackendController
+    Api <|.. ArtistBackendController
+    Api <|.. AdminBackendController
+    Api <|.. SongBackendController
+    Api <|.. AlbumBackendController
+    Api <|.. PlaylistBackendController
+    Api <|.. LibraryBackendController
+    Api <|.. ListeningHistoryBackendController
+    Api <|.. ArtistRequestBackendController
 }
 
 
@@ -900,15 +969,15 @@ ArtistBackendController -- ArtistDTO
 LibraryBackendController -- LibraryDTO
 
 ' =====================================================
-' CONTROLLER → API layer
+' CONTROLLER → Api layer
 ' =====================================================
-AlbumAPI -- AlbumBackendController
-SongAPI -- SongBackendController
-PlaylistAPI -- PlaylistBackendController
-LibraryAPI -- LibraryBackendController
-UserAPI -- UserBackendController
-ArtistRequestAPI -- ArtistRequestBackendController
-ArtistAPI -- ArtistBackendController
-AdminAPI -- AdminBackendController
+AlbumApi -- AlbumBackendController
+SongApi -- SongBackendController
+PlaylistApi -- PlaylistBackendController
+LibraryApi -- LibraryBackendController
+UserApi -- UserBackendController
+ArtistRequestApi -- ArtistRequestBackendController
+ArtistApi -- ArtistBackendController
+AdminApi -- AdminBackendController
 }
 @enduml

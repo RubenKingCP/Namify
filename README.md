@@ -11,4 +11,4 @@ To run Client:
 To run Server:
 1. Open the terminal and navigate to the `Code/TunixServer/` directory.
 2. Run the command `./gradlew build`
-3. After the build is successful, run the command `./gradlew run` to start the server application.
+3. After the build is successful, run the command `./gradlew bootRun` to start the server application.

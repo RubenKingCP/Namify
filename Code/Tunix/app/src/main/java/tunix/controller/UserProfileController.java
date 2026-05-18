@@ -1,4 +1,4 @@
-package tunix.controller.account;
+package tunix.controller;
 
 public class UserProfileController {
     
