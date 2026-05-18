@@ -31,7 +31,7 @@ ccp --> cp
 search --> ins : Δεν βρέθηκαν αποτελέσματα
 ins --> ps : Μήνυμα προς χρήστη
 u --> ps : "Add Song"
-ps --> addSong
+ps --> addsong
 addsong --> addSong
 addSong --> search
 @enduml 
