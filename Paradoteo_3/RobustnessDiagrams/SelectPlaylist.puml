@@ -3,34 +3,27 @@
 title Επιλογή Λίστας Αναπαραγωγής
 
 actor "Χρήστης" as u 
-boundary "Library" as lib 
+boundary "Μενού Πλοήγησης" as lib 
 database "Βάση Δεδομένων" as db
 control "Αναζήτησε τραγούδια" as search 
 control "Εμφάνισε τραγούδια" as ss
-boundary "Οθόνη Playlist" as ps
-control "Ενημέρωσε τον χρήσητ ότι δεν έχει playlists" as np
-usecase "Δημιουργία Λίστας Αναπαραγωγής" as cp
-control "Δημιούργησε Playlist" as ccp
+boundary "Playlist Options" as ps
 control "Ενημέρωσε πως δεν υπάρχουν τραγούδια" as ins
 control "Πρόσθεσε τραγούδι" as addsong
 usecase "Προσθήκη Τραγουδιού σε Λίστα Αναπαραγωγής" as addSong
 
-u -> lib : Επιλογή playlist
+u -> lib : Επιλογή playlist: Default Favorites
 lib -> search
 search -> db 
 search -> ss
 ss -> ps
-ps -> u
+ps <-> u
 
-lib --> np : Δεν υπάρχουν playlists
-np --> ps : Μήνυμα προς χρήστη
-u --> ps : "Create Playlist"
-ps --> ccp
-ccp --> cp
+
+
 
 search --> ins : Δεν βρέθηκαν αποτελέσματα
 ins --> ps : Μήνυμα προς χρήστη
-u --> ps : "Add Song"
 ps --> addsong
 addsong --> addSong
 addSong --> search
