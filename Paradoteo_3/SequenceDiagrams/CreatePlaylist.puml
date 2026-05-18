@@ -1,0 +1,65 @@
+@startuml CreatePlaylist
+actor User as user 
+participant LibraryView as libraryView
+participant LibraryController as libraryController
+participant LibraryService as libraryService
+participant EventBus as eventBus
+participant PlaylistService as playlistService
+participant PlaylistView as playlistView
+participant PlaylistController as playlistController
+    participant PlaylistAPI as playlistApi
+    participant PlaylistBackendController as playlistBackendController
+    participant PlaylistBackendService as playlistBackendService
+    participant PlaylistBackendRepository as playlistBackendRepository
+    database Database as database
+user -> libraryView: "Right click on library"
+activate libraryView
+libraryView -> libraryView : "popUpMenu()"
+libraryView -> user : "Show pop-up menu"
+user -> libraryView : "Select 'Create Playlist'"
+libraryView -> libraryController : "createPlaylist()"
+activate libraryController
+libraryController -> libraryService : "createPlaylist()"
+activate libraryService
+libraryService -> eventBus : "publish(PlaylistCreatedEvent)"
+deactivate libraryService
+deactivate libraryController
+deactivate libraryView
+activate eventBus
+eventBus -> playlistController : "onPlaylistCreated(PlaylistCreatedEvent)"
+activate playlistController
+playlistController -> playlistView : "showPlaylist(Playlist)"
+activate playlistView
+playlistView -> playlistView : "showPlaylistEditor(Playlist)"
+playlistView -> user : "Display playlist view and editor"
+user -> playlistView : "Enter playlist details and save"
+playlistView -> playlistController : "savePlaylist(Playlist)"
+activate playlistController
+playlistController -> playlistService : "savePlaylist(Playlist)"
+activate playlistService
+playlistService -> playlistService : "checkForDuplicateName(Playlist)"
+alt Duplicate Name
+    playlistService -> playlistController : "notifyDuplicateName()"
+    playlistController -> playlistView : "showDuplicateNameError()"
+else Unique Name
+    playlistService -> playlistApi : "savePlaylist(Playlist)"
+    activate playlistApi
+    playlistApi -> playlistBackendController : "savePlaylist(Playlist)"
+    activate playlistBackendController
+    playlistBackendController -> playlistBackendService : "savePlaylist(Playlist)"
+    activate playlistBackendService
+    playlistBackendService -> playlistBackendRepository : "savePlaylist(Playlist)"
+    activate playlistBackendRepository
+    playlistBackendRepository -> database : "insert playlist into database query"
+    database --> playlistBackendRepository : "playlist saved confirmation"
+    deactivate playlistBackendRepository
+    deactivate playlistBackendService
+    deactivate playlistBackendController
+    deactivate playlistApi
+end
+playlistService -> playlistController : "playlist saved confirmation"
+deactivate playlistService
+playlistController -> playlistView : "updatePlaylistView(Playlist)"
+deactivate playlistController
+playlistView -> user : "Show created playlist view and popup"
+@enduml
