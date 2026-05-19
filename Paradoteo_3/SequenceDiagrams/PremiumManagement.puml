@@ -12,7 +12,7 @@ participant PremiumBackendService as foo10
 participant PremiumBackendRepository as foo11
 database Database as foo12
 
-== Open Premium & Fetch Status ==
+'== Open Premium & Fetch Status ==
 
 foo1 -> foo2 : User opens premium options
 
@@ -71,7 +71,7 @@ deactivate foo6
 deactivate foo5
 
 
-== User Actions ==
+'== User Actions ==
 
 alt Toggle auto-renewal
     foo1 -> foo5 : Press auto-renewal toggle

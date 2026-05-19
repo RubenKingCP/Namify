@@ -140,7 +140,7 @@ PlaylistController --> PlaylistView : renderSongs(song list)
 
 deactivate PlaylistController
 
-PlaylistView --> User : Display playlist songs
+'PlaylistView --> User : Display playlist songs
 
 
 User -> SearchView : Search Song
@@ -197,7 +197,7 @@ alt Songs Found
 
     SearchController --> SearchView : displaySongs(results)
 
-    SearchView --> User : Show matching songs
+    'SearchView --> User : Show matching songs
 
     User -> PlaylistView : Click "Add Song"
 
@@ -228,7 +228,7 @@ alt Songs Found
 
         SongController --> PlaylistView : showSongAlreadyExistsMessage()
 
-        PlaylistView --> User : "Song already exists"
+        'PlaylistView --> User : "Song already exists"
 
     else Song Does Not Exist
 
@@ -281,7 +281,7 @@ alt Songs Found
 
         SongController --> PlaylistView : refreshPlaylist()
 
-        PlaylistView --> User : Updated playlist displayed
+        'PlaylistView --> User : Updated playlist displayed
 
     end
 
@@ -291,7 +291,7 @@ else No Songs Found
 
     SearchController --> SearchView : showNoSongsFound()
 
-    SearchView --> User : "No songs found"
+    'SearchView --> User : "No songs found"
 
 end
 

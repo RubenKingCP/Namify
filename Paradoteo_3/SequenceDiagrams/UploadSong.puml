@@ -32,7 +32,7 @@ uploadView -> uploadView: display()
 deactivate eventBus
 deactivate uploadController
 
-uploadView -> artist : Display upload view
+'uploadView -> artist : Display upload view
 artist -> uploadView: Fill details
 artist -> uploadView: Select file
 
@@ -124,7 +124,7 @@ else
     profileController -> profileView: display()
     activate profileView
     deactivate profileController
-    profileView -> artist: Refresh profile view to show new song
+    'profileView -> artist: Refresh profile view to show new song
 end
  
 @enduml

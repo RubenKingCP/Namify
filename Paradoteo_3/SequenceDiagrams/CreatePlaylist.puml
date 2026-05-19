@@ -15,7 +15,7 @@ participant PlaylistController as playlistController
 user -> libraryView: "Right click on library"
 activate libraryView
 libraryView -> libraryView : "popUpMenu()"
-libraryView -> user : "Show pop-up menu"
+'libraryView -> user : "Show pop-up menu"
 user -> libraryView : "Select 'Create Playlist'"
 libraryView -> libraryController : "createPlaylist()"
 activate libraryController
@@ -31,7 +31,7 @@ activate playlistController
 playlistController -> playlistView : "showPlaylist(Playlist)"
 activate playlistView
 playlistView -> playlistView : "showPlaylistEditor(Playlist)"
-playlistView -> user : "Display playlist view and editor"
+'playlistView -> user : "Display playlist view and editor"
 user -> playlistView : "Enter playlist details and save"
 playlistView -> playlistController : "savePlaylist(Playlist)"
 activate playlistController
@@ -61,5 +61,5 @@ playlistService -> playlistController : "playlist saved confirmation"
 deactivate playlistService
 playlistController -> playlistView : "updatePlaylistView(Playlist)"
 deactivate playlistController
-playlistView -> user : "Show created playlist view and popup"
+'playlistView -> user : "Show created playlist view and popup"
 @enduml
