@@ -5,7 +5,6 @@ skinparam linetype ortho
 
 title Πληρωμή μέσω τραπεζικού λογαριασμού
 
-usecase "Login" as L
 control "Υπάρχουν στοιχεία?" as checkCredent
 entity "Βάση Δεδομένων" as db 
 control "Εμφάνισε οθόνη πληρωμής" as disPayScr
@@ -16,7 +15,6 @@ entity "Τραπεζικό Σύστημα" as bank
 control "Στείλε αίτημα μεταφοράς" as sendReq
 control "Αποθήκευσε τα στοιχεία" as saveCred
 
-L -> checkCredent
 checkCredent -> db
 checkCredent -> disPayScr : Όχι
 disPayScr -> payScr
