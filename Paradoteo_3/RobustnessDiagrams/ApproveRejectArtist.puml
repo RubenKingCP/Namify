@@ -16,11 +16,11 @@ control "Εμφάνισε λεπτομέρειες αίτησης" as Details
 control "Πάρε απάντηση" as Response
 control "Ενημέρωσε βάση" as UpdateDB
 
-database "Βάση Δεδομένων" as DB
+entity "Βάση Δεδομένων" as DB
 
 Admin --> Menu
 Menu --> FetchApps
-FetchApps --> DB
+FetchApps -- DB
 FetchApps --> AppList
 
 Admin --> AppList
@@ -31,7 +31,7 @@ Response --> Message : Reject
 Message --> User
 
 Response --> UpdateDB : Approve
-UpdateDB --> DB
+UpdateDB -- DB
 UpdateDB --> Message
 
 @enduml

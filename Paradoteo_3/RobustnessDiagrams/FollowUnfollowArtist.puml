@@ -1,66 +1,73 @@
-@startuml
+@startuml Follow_Unfollow_Artist
 
-title Follow/Unfollow Artist
+title Follow / Unfollow Artist
 
 left to right direction
-
 skinparam shadowing false
-skinparam roundcorner 10
+skinparam roundcorner 12
+skinparam packageStyle rectangle
+skinparam monochrome true
 
 ' =====================================================
-' ACTORS
+' ACTOR
 ' =====================================================
 
-actor Γενικός_Χρήστης
+actor "Γενικός Χρήστης" as User
 
 ' =====================================================
-' BOUNDARY OBJECTS
+' BOUNDARY
 ' =====================================================
 
-boundary Μενού_Πληροφοριών_Καλλιτέχνη
-boundary Popup_Error
-boundary Popup_Απεγγραφής
-boundary Popup_Εγγραφής
+boundary "Μενού Πληροφοριών\nΚαλλιτέχνη" as ArtistMenu
+boundary "Popup Επιτυχίας\nΕγγραφής" as FollowPopup
+boundary "Popup Επιτυχίας\nΑπεγγραφής" as UnfollowPopup
+boundary "Popup Σφάλματος" as ErrorPopup
 
 ' =====================================================
-' CONTROL OBJECTS
+' CONTROL
 ' =====================================================
 
-control Έλεγξε_Αν_Ήδη_Ακολουθεί
-control Απεγγραφή_Από_Καλλιτέχνη
-control Εγγραφή_Σε_Καλλιτέχνη
+control "Έλεγχος\nΑκολούθησης" as CheckFollow
+control "Εγγραφή σε\nΚαλλιτέχνη" as FollowArtist
+control "Απεγγραφή από\nΚαλλιτέχνη" as UnfollowArtist
 
 ' =====================================================
-' ENTITY OBJECTS
+' ENTITY
 ' =====================================================
 
-entity Βάση_Δεδομένων
+entity "Βάση Δεδομένων" as DB
 
 ' =====================================================
-' USE CASES
+' USE CASE
 ' =====================================================
 
-usecase Αναζήτηση_Καλλιτέχνη_Search_Content
-
+usecase "Αναζήτηση Καλλιτέχνη" as SearchArtist
 
 ' =====================================================
-' INTERACTIONS
+' FLOW
 ' =====================================================
 
-Γενικός_Χρήστης --> Αναζήτηση_Καλλιτέχνη_Search_Content
-Αναζήτηση_Καλλιτέχνη_Search_Content --> Μενού_Πληροφοριών_Καλλιτέχνη: επιλέγει το καλλιτέχνη που θέλει
-Μενού_Πληροφοριών_Καλλιτέχνη --> Έλεγξε_Αν_Ήδη_Ακολουθεί : Επιλέγει Follow 
-Έλεγξε_Αν_Ήδη_Ακολουθεί --> Απεγγραφή_Από_Καλλιτέχνη : ναι
-Έλεγξε_Αν_Ήδη_Ακολουθεί --> Εγγραφή_Σε_Καλλιτέχνη : όχι
-Απεγγραφή_Από_Καλλιτέχνη --> Βάση_Δεδομένων : Επιτυχής-Update
-Εγγραφή_Σε_Καλλιτέχνη <--> Βάση_Δεδομένων : Επιτυχής-Update
-Εγγραφή_Σε_Καλλιτέχνη --> Popup_Εγγραφής : Επιτυχής
-Απεγγραφή_Από_Καλλιτέχνη --> Popup_Απεγγραφής : Επιτυχής
-Εγγραφή_Σε_Καλλιτέχνη --> Popup_Error : Ανεπιτυχής
-Απεγγραφή_Από_Καλλιτέχνη --> Popup_Error : Ανεπιτυχής
-Popup_Error --> Γενικός_Χρήστης
-Popup_Error --> Μενού_Πληροφοριών_Καλλιτέχνη
-Popup_Απεγγραφής --> Γενικός_Χρήστης
-Popup_Εγγραφής --> Γενικός_Χρήστης
+User --> SearchArtist
+SearchArtist --> ArtistMenu : εμφάνιση καλλιτέχνη
+
+User --> ArtistMenu : Follow / Unfollow
+
+ArtistMenu --> CheckFollow : έλεγχος κατάστασης
+
+CheckFollow --> FollowArtist : δεν ακολουθεί
+CheckFollow --> UnfollowArtist : ήδη ακολουθεί
+
+FollowArtist --> DB : update
+UnfollowArtist --> DB : update
+
+FollowArtist --> FollowPopup : επιτυχία
+UnfollowArtist --> UnfollowPopup : επιτυχία
+
+FollowArtist --> ErrorPopup : αποτυχία
+UnfollowArtist --> ErrorPopup : αποτυχία
+
+FollowPopup --> User
+UnfollowPopup --> User
+ErrorPopup --> User
 
 @enduml

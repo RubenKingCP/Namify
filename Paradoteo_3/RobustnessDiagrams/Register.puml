@@ -5,7 +5,7 @@ title Register
 actor "Χρήστης" as u 
 boundary "Φόρμα εγγραφής" as ap
 control "Έλεγξε για ψευδόνυμο ή email" as nickmail
-database "Βάση Δεδομένων" as db 
+entity "Βάση Δεδομένων" as db 
 usecase "Login" as log
 control "Ενημέρωσε τον χρήστη 'οτι το ψευδόνυμο υπάρχει και ξεκίνα από την αρχή" as exname
 control "Ενημέρωσε τον χρήστη ότι λογαριασμός με αυτό το mail υπάρχει ήδη" as exmail

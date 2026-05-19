@@ -6,7 +6,7 @@ actor "Χρήστης" as User
 
 boundary "Οθόνη Login" as LoginScreen
 control "Έλεγξε στοιχεία" as Auth
-database "Βάση Δεδομένων" as DB
+entity "Βάση Δεδομένων" as DB
 control "Αρχικοποίησε εφαρμογή" as InitApp
 control "Ενημέρωσηε πως ο κωδικός είναι λανθασμένος" as WrongPass
 control "Ο λογαριασμός δεν υπάρχει, δημιουύργησε έναν" as CreateAccount

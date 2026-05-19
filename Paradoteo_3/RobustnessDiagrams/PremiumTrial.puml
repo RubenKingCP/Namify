@@ -1,4 +1,4 @@
-@startuml
+@startuml name
 
 title Premium Trial
 
@@ -38,7 +38,6 @@ control Check_Free_Trial
 ' =====================================================
 
 entity Βάση_Δεδομένων
-entity Τραπεζικό_Σύστημα
 
 ' =====================================================
 ' USE CASES
@@ -52,11 +51,11 @@ usecase Payment_Through_Bank_Account
 Γενικός_Χρήστης --> Μενού_Πλοήγησης 
 Μενού_Πλοήγησης --> Επιλογή_Στοιχεία_Πλοήγησης
 Επιλογή_Στοιχεία_Πλοήγησης --> Οθόνη_Premium_Πακέτων
+Γενικός_Χρήστης --> Οθόνη_Premium_Πακέτων : Επιλέγει Premium Πακέτο
 Οθόνη_Premium_Πακέτων --> Check_Free_Trial
 Check_Free_Trial --> Free_Trial_Button : If Free_Trial = 0 ,show
 Γενικός_Χρήστης --> Free_Trial_Button
 Free_Trial_Button --> Payment_Through_Bank_Account 
-Payment_Through_Bank_Account --> Τραπεζικό_Σύστημα : Fee 0, Gathers bank info for auto renew 
 Payment_Through_Bank_Account --> Οθόνη_Επιτυχίας_Trial : Επιτυχής
 Οθόνη_Επιτυχίας_Trial --> Βάση_Δεδομένων : Set Premium_Plan_Type, Set Free_Trial =1 , Set Premium_Plan_Auto_Renew = 0
 Payment_Through_Bank_Account --> Error_Trial_Popup : Ανεπιτυχής

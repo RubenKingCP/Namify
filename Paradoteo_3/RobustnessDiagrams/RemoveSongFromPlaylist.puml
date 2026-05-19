@@ -8,7 +8,7 @@ boundary "Οθόνη Playlist" as PlScreen
 control "Εμφάνισε μενού επιλογών" as disMenu
 boundary "Μενού επιλογών" as menu
 control "Αφαίρεσε τραγούδι και ενημέρωσε βάση" as rm
-database "Βάση Δεδομένων" as db
+entity "Βάση Δεδομένων" as db
 
 selectPl -> PlScreen
 user -> PlScreen : Επιλεγμένο τραγούδι

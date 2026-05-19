@@ -8,7 +8,7 @@ control "Εμφάνισε ρυθμίσεις προφίλ" as disPrSett
 boundary "Ρυθμίσεις Προφίλ" as PrSett
 control "Εμφάνισε ερωτηματολόγιο" as disQue
 boundary "Ερωτηματολόγιο" as que
-database "Βάση Δεδομένων" as db
+entity "Βάση Δεδομένων" as db
 control "Αποθήκευσε Αίτηση" as saveApplication
 usecase "Έγκριση/Απόρριψη Λογαριασμού Καλλιτέχνη" as appOrRej
 user -> mainScreen : Προφίλ
